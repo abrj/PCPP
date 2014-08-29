@@ -1,0 +1,37 @@
+Exercise 1.1
+	1) The result value will have a maximum of 10 millions, but most likely smaller than that due to lost-update issues 
+	
+	2) The reason the end result might look more correct is that the possibility of the lost-update issues is far less, when running the experiement with 100 iterations instead of 10 millions. Even though the possibility of a correnct end result being higher, than with 10 millions, we would not guarantee that it would always be correct.
+	
+	3) Using count++ instead of count += 1 or count = count+1 would not make a difference, since this operations is not atomic. However using an atomicInteger, which is atomic, would make a difference.
+	
+	4) The final result of count will be 0, since both increment() and decrement() are syncronized. If one of the methods wasn't syncronized the issues of lost-updates would be present and the final result could become wrong.
+
+	5) Experiements results:
+		a) no methods syncronized:
+			Count is -8840293 and should be 20000000
+			Count is -23965 and should be 20000000
+			Count is 19582 and should be 20000000
+		b) decrement method syncronized
+			Count is -7340 and should be 20000000
+			Count is -10022 and should be 20000000
+			Count is -10358 and should be 20000000
+		c) increment method syncronized
+			Count is -5237 and should be 20000000
+			Count is 4510 and should be 20000000
+			Count is 1790 and should be 20000000
+		d) Both methods syncronized
+			Count is 0 and should be 20000000
+
+		The three first test cases show that with no methods being syncronized produces just as inaccurate result than as with one of the methods syncronized. This means that not syncronizing one method is the same as not syncronizing any of the methods.
+
+	Exercise 1.2
+		1) See the java file Innerclass.java
+
+	Exercise 1.3 
+		1) See the java file ThreadTester.java
+		2) Putting synchronized in the signature of the print method will prevent more than one thread at a time accessing the print method at a time. 
+
+		3) See the java file ThreadTester.java
+		4) See the java file ThreadTester.java
+
