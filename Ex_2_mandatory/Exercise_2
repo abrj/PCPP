@@ -1,0 +1,13 @@
+Mandatory Exercise 2
+
+### Ex 2.1 ###
+1) Yes, we have observed the same as in the lecture
+
+2) Yes, the use of synchronized made the thread terminate
+
+3) When removing the synchronized keyword on get(), the thread does no longer terminate. In order to achieve visibility across threads all methods have to be synchronized. 
+
+4) Since only one thread (main) is writing to value, the get() and set() methods does not have to be synchronized. However the value needs to be volatile in order to guarantee visibility.
+
+### Ex 2.2 ###
+1

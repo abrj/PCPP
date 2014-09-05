@@ -26,11 +26,11 @@ public class TestMutableInteger {
 // From Goetz p. 36.  WARNING: Useless without "volatile" or
 // "synchronized" to ensure visibility of writes across threads:
 class MutableInteger {
-  private int value = 0;   
-  public synchronized void set(int value) {
+  private volatile int value = 0;   
+  public void set(int value) {
     this.value = value;
   }
-  public synchronized int get() { 
+  public int get() { 
     return value; 
   }
 }
