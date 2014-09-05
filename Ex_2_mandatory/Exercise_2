@@ -10,4 +10,14 @@ Mandatory Exercise 2
 4) Since only one thread (main) is writing to value, the get() and set() methods does not have to be synchronized. However the value needs to be volatile in order to guarantee visibility.
 
 ### Ex 2.2 ###
-1
+1) realtime: 6,48sec
+
+2) realtime: 1,45sec. It is faster.
+
+3) No it does not produce the correct result. This is caused by lost-update issues.
+
+4) When more than one thread is computing the result, both increment() and get() methods have to be synchronized, in order to avoid lost-update issues. In the case were only one thread was doing the computation, the use of volatile keyword would suffice.  
+
+
+
+
