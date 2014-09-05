@@ -16,7 +16,18 @@ Mandatory Exercise 2
 
 3) No it does not produce the correct result. This is caused by lost-update issues.
 
-4) When more than one thread is computing the result, both increment() and get() methods have to be synchronized, in order to avoid lost-update issues. In the case were only one thread was doing the computation, the use of volatile keyword would suffice.  
+4) When more than one thread is computing the result, both increment() and get() methods have to be synchronized, in order to avoid lost-update issues. In the case were only one thread was doing the computation, the use of volatile keyword would suffice. 
+
+### Ex 2.3 ###
+1) realtime: 6,3sec
+
+2) Look in the java file MyAtomicInteger.java
+
+3) realtime: 1,7sec with the correct result
+
+4) A volatile field would not suffice, since more than one thread is updating the value
+
+5) realtime: 1,6sec. The speed is a little bit faster (0,1sec). Yes, according Bloch, all fields should be declared final, unless they have reason not to be. In this case we are not altering the object reference, but simply the state of that object, hence the field can be declared final.   
 
 
 
