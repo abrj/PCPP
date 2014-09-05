@@ -27,10 +27,10 @@ public class TestMutableInteger {
 // "synchronized" to ensure visibility of writes across threads:
 class MutableInteger {
   private int value = 0;   
-  public void set(int value) {
+  public synchronized void set(int value) {
     this.value = value;
   }
-  public int get() { 
+  public synchronized int get() { 
     return value; 
   }
 }
