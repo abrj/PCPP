@@ -1,0 +1,39 @@
+Mandatory Exercise 2
+
+### Ex 2.1 ###
+1) Yes, we have observed the same as in the lecture
+
+2) Yes, the use of synchronized made the thread terminate
+
+3) When removing the synchronized keyword on get(), the thread does no longer terminate. In order to achieve visibility across threads all methods have to be synchronized. 
+
+4) Since only one thread (main) is writing to value, the get() and set() methods does not have to be synchronized. However the value needs to be volatile in order to guarantee visibility.
+
+### Ex 2.2 ###
+1) realtime: 6,48sec
+
+2) realtime: 1,45sec. It is faster.
+
+3) No it does not produce the correct result. This is caused by lost-update issues.
+
+4) When more than one thread is computing the result, both increment() and get() methods have to be synchronized, in order to avoid lost-update issues. In the case were only one thread was doing the computation, the use of volatile keyword would suffice. 
+
+### Ex 2.3 ###
+1) realtime: 6,3sec
+
+2) Look in the java file MyAtomicInteger.java
+
+3) realtime: 1,7sec with the correct result
+
+4) A volatile field would not suffice, since more than one thread is updating the value
+
+5) realtime: 1,6sec. The speed is a little bit faster (0,1sec). Yes, according Bloch, all fields should be declared final, unless they have reason not to be. In this case we are not altering the object reference, but simply the state of that object, hence the field can be declared final. 
+
+### Ex 2.4 ###
+1) By declaring the cache volatile, ensures that when using it in line 179, the newest value of cache is used. 
+
+2) Since neither of the fields are being altered after constructiong, they can both be declared final, which is correct, according to Bloch. 
+
+
+
+
