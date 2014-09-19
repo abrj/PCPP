@@ -1,3 +1,4 @@
+import java.util.concurrent.atomic.AtomicLong;
 // Week 4
 // Counting primes, using multiple threads for better performance.
 // (Much simplified from CountprimesMany.java)
@@ -49,15 +50,20 @@ public class TestCountPrimesThreads {
   // General parallel solution, using multiple threads
   private static long countParallelN(int range, int threadCount) {
     final int perThread = range / threadCount;
-    final LongCounter lc = new LongCounter();
+	//final LongCounter lc = new LongCounter();
+    final AtomicLong lc = new AtomicLong();
     Thread[] threads = new Thread[threadCount];
     for (int t=0; t<threadCount; t++) {
       final int from = perThread * t, 
         to = (t+1==threadCount) ? range : perThread * (t+1); 
       threads[t] = new Thread(new Runnable() { public void run() {
+		int privCount = 0;
         for (int i=from; i<to; i++)
           if (isPrime(i))
-            lc.increment();
+            //lc.increment();
+			//lc.incrementAndGet();
+			privCount++;
+		lc.addAndGet(privCount);
       }});
     }
     for (int t=0; t<threadCount; t++) 

@@ -119,3 +119,44 @@ Assignemnt 4.2
 	the result 5.5 ns might be surpricing. One must keep in mind 
 	that it takes longer with a lower count, and this is likely the reason
 	that the number is not 5.0 ns.
+
+
+Assignment 4.3
+
+1:
+See \pcpp-week04\Outputs\Exercise_4.3.1.txt 
+
+2: 
+See \pcpp-week04\Outputs\Exercise_4.3.2.JPG
+
+3: 
+Everything with the exception of perhaps number 5 looks fine.
+At 5 a spike occurs, probably because of something else stealing resources.
+We see that the curve decreases a lot in the first couple of threads,
+until one point where the creation of threads makes the program slower
+because it cannot run all the (expensive) threads that were created. 
+
+4:
+See \pcpp-week04\Outputs\Exercise_4.3.4.txt 
+
+	The stability does not seems to have increased compared to the
+	LongCounter, in fact the number of "spikes" are the same.
+	We can also observe that the pattern behave (as expected) the same.
+	The time increases until such point where it is no longer worth
+	creating new threads.
+	This occurs at the exact same spot (10) as using the LongCounter.
+	We can also observe a general decrease in time spent.
+
+	Generally built-in classes are optimized and efficient. If there 
+	are no special requirements, one should use the in-built ones.
+	There is no need to reinvent the wheel - if it's not a special type
+	of wheel.
+
+5:
+See \pcpp-week04\Outputs\Exercise_4.3.5.txt 
+
+	The running time is roughly the same.
+	A couple of qualified guesses to why this happens could be
+	1) the JIT compiler performs some clever optimizations
+	2) The AtomicLong is built for this? - We have not tested this
+	on the LongCounter.
