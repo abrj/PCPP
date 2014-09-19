@@ -11,23 +11,23 @@ public class TestTimeThreads {
   public static void main(String[] args) {
     SystemInfo();
     final Point myPoint = new Point(42, 39);
-    Mark6("hashCode()", 
+    Mark7("hashCode()", 
     	  new IntToDouble() { public double call(int i) {
     	    return myPoint.hashCode();
     	  }});
-    Mark6("Point creation", 
+    Mark7("Point creation", 
     	  new IntToDouble() { public double call(int i) {
     	    Point p = new Point(i, i);
     	    return p.hashCode();
     	  }});
     final AtomicInteger ai = new AtomicInteger();
-    Mark6("Thread's work", 
+    Mark7("Thread's work", 
     	  new IntToDouble() { public double call(int i) {
     	    for (int j=0; j<1000; j++)
     	      ai.getAndIncrement();
     	    return ai.doubleValue();
     	  }});
-    Mark6("Thread create", 
+    Mark7("Thread create", 
     	  new IntToDouble() { public double call(int i) {
     	    Thread t = new Thread(new Runnable() { public void run() {
     	      for (int j=0; j<1000; j++)
@@ -35,7 +35,7 @@ public class TestTimeThreads {
     	    }});
     	    return t.hashCode();
     	  }});
-    Mark6("Thread create start", 
+    Mark7("Thread create start", 
     	  new IntToDouble() { public double call(int i) {
     	    Thread t = new Thread(new Runnable() { public void run() {
     	      for (int j=0; j<1000; j++)
@@ -44,7 +44,7 @@ public class TestTimeThreads {
     	    t.start();
     	    return t.hashCode();
     	  }});
-    Mark6("Thread create start join", 
+    Mark7("Thread create start join", 
     	  new IntToDouble() { public double call(int i) {
     	    Thread t = new Thread(new Runnable() { public void run() {
     	      for (int j=0; j<1000; j++)
@@ -57,7 +57,7 @@ public class TestTimeThreads {
     	  }});
     System.out.printf("ai value = %d%n", ai.intValue());
     final Object obj = new Object();
-    Mark6("Uncontended lock", 
+    Mark7("Uncontended lock", 
 	  new IntToDouble() { public double call(int i) {
 	    synchronized (obj) {
 	      return i;
