@@ -23,21 +23,62 @@ public class TestCache {
     long[] factors = cachingFactorizer.compute(p);
     print(factors);
 
+    // print(cachingFactorizer.compute(p));
+    // print(cachingFactorizer.compute(p));
+    // print(cachingFactorizer.compute(p));
+    // print(cachingFactorizer.compute(p));
+    // print(cachingFactorizer.compute(p));
+    // print(cachingFactorizer.compute(p));
     print(cachingFactorizer.compute(p));
-    print(cachingFactorizer.compute(p));
-    print(cachingFactorizer.compute(p));
-    print(cachingFactorizer.compute(p));
-    print(cachingFactorizer.compute(p));
-    print(cachingFactorizer.compute(p));
-    print(cachingFactorizer.compute(p));
+
+    exerciseFactorizer(cachingFactorizer);
   }
+
 
   private static void print(long[] arr) {
     for (long x : arr) 
       System.out.print(" " + x);
     System.out.println();
   }
+
+  private static void exerciseFactorizer(Computable<Long, long[]> f){
+    final int threadCount = 16;
+    final long start = 10000000L, range = 2000L;
+    final long start2= 10002000L;
+    System.out.println(f);
+    Thread[] threads = new Thread[threadCount];
+
+    for(int i =0; i<threadCount; i++){
+      final long from = start + i * range;
+      final long to = start + (i+1) * range -1;
+      final long from2 = start2 + i * 500;
+      final long to2 = start2 + (i+1) * 500 - 1;
+      threads[i] = new Thread(new Runnable(){
+        public void run(){
+          try{
+            System.out.println("running from " + from + " to " + to + " and from " + from2 + " to " + to2 + " for ");
+            for(long j=from; j<to; j++){ f.compute(j);  }
+            for(long l=from2; l<to2; l++){ f.compute(l); }        
+            }
+          catch(InterruptedException i){ System.out.println("fuck"); }
+          }
+      });
+    }
+    for (int t=0; t<threadCount; t++) {
+        threads[t].start(); 
+    }
+
+    for (int t=0; t<threadCount; t++) {
+      try{
+        threads[t].join(); 
+      }
+      catch(InterruptedException i){
+        System.out.println("Fuck 2 ");
+      }
+    }
+  }
 }
+
 
 
 // Interface that represents a function from A to V
