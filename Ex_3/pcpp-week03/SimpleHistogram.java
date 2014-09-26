@@ -34,6 +34,7 @@ class Histogram1 implements Histogram {
   public void increment(int item) {
     counts[item] = counts[item] + 1;
   }
+
   public int getCount(int item) {
     return counts[item];
   }

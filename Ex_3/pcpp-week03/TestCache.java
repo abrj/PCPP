@@ -29,9 +29,12 @@ public class TestCache {
     // print(cachingFactorizer.compute(p));
     // print(cachingFactorizer.compute(p));
     // print(cachingFactorizer.compute(p));
-    print(cachingFactorizer.compute(p));
-
-    exerciseFactorizer(cachingFactorizer);
+    // print(cachingFactorizer.compute(p));
+    //Test
+    Factorizer f = new Factorizer();
+    exerciseFactorizer(new Memoizer1<Long, long[]>(f));
+    System.out.println(f.getCount());
+    // exerciseFactorizer(cachingFactorizer);
   }
 
 
@@ -43,20 +46,23 @@ public class TestCache {
 
   private static void exerciseFactorizer(Computable<Long, long[]> f){
     final int threadCount = 16;
-    final long start = 10000000L, range = 2000L;
-    final long start2= 10002000L;
+    final long start = 10000000000L, range = 20000L;
+    final long start2= 10000020000L;
     System.out.println(f);
     Thread[] threads = new Thread[threadCount];
 
     for(int i =0; i<threadCount; i++){
-      final long from = start + i * range;
-      final long to = start + (i+1) * range -1;
-      final long from2 = start2 + i * 500;
-      final long to2 = start2 + (i+1) * 500 - 1;
+      final long from = start;
+      final long to = start + range;
+      final long from2 = start+range+i*range/4; 
+      final long to2 = from2+range;
       threads[i] = new Thread(new Runnable(){
         public void run(){
           try{
-            System.out.println("running from " + from + " to " + to + " and from " + from2 + " to " + to2 + " for ");
+            System.out.println("running from " + from + " to " + to + " and from " + from2 + " to " + to2 + " with ");
+            long tmp1 = to-from;
+            long tmp2 = to2-from2;
+            System.out.println("from - to = " + tmp1 + " and from2 - to2 = " + tmp2);
             for(long j=from; j<to; j++){ f.compute(j);  }
             for(long l=from2; l<to2; l++){ f.compute(l); }        
             }
