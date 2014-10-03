@@ -38,20 +38,20 @@ class Philosopher implements Runnable {
       // Take the two forks to the left and the right
       int left = place, right = (place+1) % forks.length;
       if(left<right){
-        synchronized(left){
-          synchronized(right){
+        synchronized(forks[left]){
+          synchronized(forks[right]){
             // Eat
             System.out.print(place + " ");            
-          })
+          }
         }
       }
 
       else if(left>right){
-        synchronized(right){
-          synchronized(left{
+        synchronized(forks[right]){
+          synchronized(forks[left]){
             // Eat
             System.out.print(place + " ");            
-          })
+          }
         }
       }
       // Think
