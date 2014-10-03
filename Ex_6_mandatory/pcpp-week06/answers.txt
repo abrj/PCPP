@@ -75,3 +75,5 @@ Java stack information for the threads listed above:
 Found 1 deadlock.
 
 - 6.2.4
+Modified:
+TestPhilosophers.java
