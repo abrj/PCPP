@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" >
+
+    <head>
+        <link rel="shortcut icon" href="../ico/contemplate.png"/>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+        <script type="text/javascript" src="../lib/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript" src="../findings.js"></script>
+        <script type="text/javascript" src="../lib/codeview.js"></script>
+        <link type="text/css" rel="stylesheet" href="stylesheet.css"/>
+        <title>TestAccountDeadlock xref</title>
+    </head>
+
+    <body>
+
+        <pre data-sourcefile="TestAccountDeadlock.java"><div class="1"><a class="jxr_linenumber" name="1" href="#1">1</a>   <em class="jxr_comment">// For week 6</em></div>
+<div class="2"><a class="jxr_linenumber" name="2" href="#2">2</a>   <em class="jxr_comment">// sestoft@itu.dk * 2014-09-29</em></div>
+<div class="3"><a class="jxr_linenumber" name="3" href="#3">3</a>   </div>
+<div class="4"><a class="jxr_linenumber" name="4" href="#4">4</a>   <em class="jxr_comment">// Main points: When two objects are involved in a transaction,</em></div>
+<div class="5"><a class="jxr_linenumber" name="5" href="#5">5</a>   <em class="jxr_comment">// locking on them individually does not work.  On the other hand,</em></div>
+<div class="6"><a class="jxr_linenumber" name="6" href="#6">6</a>   <em class="jxr_comment">// locking too aggressively leads to deadlock.  Always locking in a</em></div>
+<div class="7"><a class="jxr_linenumber" name="7" href="#7">7</a>   <em class="jxr_comment">// consistent order works.</em></div>
+<div class="8"><a class="jxr_linenumber" name="8" href="#8">8</a>   </div>
+<div class="9"><a class="jxr_linenumber" name="9" href="#9">9</a>   <em class="jxr_comment">// TransferC: Locks both accounts to make the transfer atomic, but</em></div>
+<div class="10"><a class="jxr_linenumber" name="10" href="#10">10</a>  <em class="jxr_comment">// does not take locks in consistent order and so may deadlock.</em></div>
+<div class="11"><a class="jxr_linenumber" name="11" href="#11">11</a>  </div>
+<div class="12"><a class="jxr_linenumber" name="12" href="#12">12</a>  <strong class="jxr_keyword">import</strong> java.util.Random;</div>
+<div class="13"><a class="jxr_linenumber" name="13" href="#13">13</a>  </div>
+<div class="14"><a class="jxr_linenumber" name="14" href="#14">14</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="TestAccountDeadlock.html">TestAccountDeadlock</a> {</div>
+<div class="15"><a class="jxr_linenumber" name="15" href="#15">15</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> main(String[] args) {</div>
+<div class="16"><a class="jxr_linenumber" name="16" href="#16">16</a>      <strong class="jxr_keyword">final</strong> <a href="UnsafeAccount.html">Account</a> account1 = <strong class="jxr_keyword">new</strong> <a href="UnsafeAccount.html">Account</a>(), account2 = <strong class="jxr_keyword">new</strong> Account();</div>
+<div class="17"><a class="jxr_linenumber" name="17" href="#17">17</a>      <strong class="jxr_keyword">final</strong> Random rnd = <strong class="jxr_keyword">new</strong> Random();</div>
+<div class="18"><a class="jxr_linenumber" name="18" href="#18">18</a>      <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> transfers = 2_000_000;</div>
+<div class="19"><a class="jxr_linenumber" name="19" href="#19">19</a>      account1.deposit(3000); account2.deposit(2000);</div>
+<div class="20"><a class="jxr_linenumber" name="20" href="#20">20</a>      Thread clerk1 = <strong class="jxr_keyword">new</strong> Thread(<strong class="jxr_keyword">new</strong> Runnable() {</div>
+<div class="21"><a class="jxr_linenumber" name="21" href="#21">21</a>  	<strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> run() { </div>
+<div class="22"><a class="jxr_linenumber" name="22" href="#22">22</a>  	  <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i=0; i&lt;transfers; i++) </div>
+<div class="23"><a class="jxr_linenumber" name="23" href="#23">23</a>  	    account1.transferC(account2, rnd.nextInt(10000));</div>
+<div class="24"><a class="jxr_linenumber" name="24" href="#24">24</a>  	}</div>
+<div class="25"><a class="jxr_linenumber" name="25" href="#25">25</a>        });</div>
+<div class="26"><a class="jxr_linenumber" name="26" href="#26">26</a>      Thread clerk2 = <strong class="jxr_keyword">new</strong> Thread(<strong class="jxr_keyword">new</strong> Runnable() {</div>
+<div class="27"><a class="jxr_linenumber" name="27" href="#27">27</a>  	<strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> run() { </div>
+<div class="28"><a class="jxr_linenumber" name="28" href="#28">28</a>  	  <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i=0; i&lt;transfers; i++) </div>
+<div class="29"><a class="jxr_linenumber" name="29" href="#29">29</a>  	    account2.transferC(account1, rnd.nextInt(10000));</div>
+<div class="30"><a class="jxr_linenumber" name="30" href="#30">30</a>  	}</div>
+<div class="31"><a class="jxr_linenumber" name="31" href="#31">31</a>        });</div>
+<div class="32"><a class="jxr_linenumber" name="32" href="#32">32</a>      clerk1.start(); clerk2.start();</div>
+<div class="33"><a class="jxr_linenumber" name="33" href="#33">33</a>      <em class="jxr_comment">// We occasionally print the account balances during the transfer:</em></div>
+<div class="34"><a class="jxr_linenumber" name="34" href="#34">34</a>      <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i=0; i&lt;40; i++) {</div>
+<div class="35"><a class="jxr_linenumber" name="35" href="#35">35</a>        <strong class="jxr_keyword">try</strong> { Thread.sleep(10); } <strong class="jxr_keyword">catch</strong> (InterruptedException exn) { }</div>
+<div class="36"><a class="jxr_linenumber" name="36" href="#36">36</a>        <em class="jxr_comment">// Locking both accounts is necessary to avoid reading the</em></div>
+<div class="37"><a class="jxr_linenumber" name="37" href="#37">37</a>        <em class="jxr_comment">// balance in the middle of a transfer.</em></div>
+<div class="38"><a class="jxr_linenumber" name="38" href="#38">38</a>        System.out.println(account1.get() + account2.get());</div>
+<div class="39"><a class="jxr_linenumber" name="39" href="#39">39</a>      }</div>
+<div class="40"><a class="jxr_linenumber" name="40" href="#40">40</a>      <em class="jxr_comment">// The auditor prints the account balance sum when the clerks are finished: </em></div>
+<div class="41"><a class="jxr_linenumber" name="41" href="#41">41</a>      <strong class="jxr_keyword">try</strong> { clerk1.join(); clerk2.join(); } <strong class="jxr_keyword">catch</strong> (InterruptedException exn) { }</div>
+<div class="42"><a class="jxr_linenumber" name="42" href="#42">42</a>      System.out.printf(<div class="jxr_string">"%nFinal sum is %d%n"</div>, account1.get() + account2.get());</div>
+<div class="43"><a class="jxr_linenumber" name="43" href="#43">43</a>    }</div>
+<div class="44"><a class="jxr_linenumber" name="44" href="#44">44</a>  }</div>
+<div class="45"><a class="jxr_linenumber" name="45" href="#45">45</a>  </div>
+<div class="46"><a class="jxr_linenumber" name="46" href="#46">46</a>  </div>
+<div class="47"><a class="jxr_linenumber" name="47" href="#47">47</a>  <strong class="jxr_keyword">class</strong> <a href="UnsafeAccount.html">Account</a> {</div>
+<div class="48"><a class="jxr_linenumber" name="48" href="#48">48</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">long</strong> balance = 0;</div>
+<div class="49"><a class="jxr_linenumber" name="49" href="#49">49</a>  </div>
+<div class="50"><a class="jxr_linenumber" name="50" href="#50">50</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">synchronized</strong> <strong class="jxr_keyword">void</strong> deposit(<strong class="jxr_keyword">long</strong> amount) {</div>
+<div class="51"><a class="jxr_linenumber" name="51" href="#51">51</a>      balance += amount;</div>
+<div class="52"><a class="jxr_linenumber" name="52" href="#52">52</a>    }</div>
+<div class="53"><a class="jxr_linenumber" name="53" href="#53">53</a>  </div>
+<div class="54"><a class="jxr_linenumber" name="54" href="#54">54</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">synchronized</strong> <strong class="jxr_keyword">long</strong> get() {</div>
+<div class="55"><a class="jxr_linenumber" name="55" href="#55">55</a>      <strong class="jxr_keyword">return</strong> balance;</div>
+<div class="56"><a class="jxr_linenumber" name="56" href="#56">56</a>    }</div>
+<div class="57"><a class="jxr_linenumber" name="57" href="#57">57</a>  </div>
+<div class="58"><a class="jxr_linenumber" name="58" href="#58">58</a>    <em class="jxr_comment">// This may deadlock</em></div>
+<div class="59"><a class="jxr_linenumber" name="59" href="#59">59</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> transferC(<a href="UnsafeAccount.html">Account</a> that, <strong class="jxr_keyword">long</strong> amount) {</div>
+<div class="60"><a class="jxr_linenumber" name="60" href="#60">60</a>      <strong class="jxr_keyword">synchronized</strong> (<strong class="jxr_keyword">this</strong>) { <strong class="jxr_keyword">synchronized</strong>(that) { </div>
+<div class="61"><a class="jxr_linenumber" name="61" href="#61">61</a>  	<strong class="jxr_keyword">this</strong>.balance = <strong class="jxr_keyword">this</strong>.balance - amount;</div>
+<div class="62"><a class="jxr_linenumber" name="62" href="#62">62</a>  	that.balance = that.balance + amount;</div>
+<div class="63"><a class="jxr_linenumber" name="63" href="#63">63</a>        } }</div>
+<div class="64"><a class="jxr_linenumber" name="64" href="#64">64</a>    }</div>
+<div class="65"><a class="jxr_linenumber" name="65" href="#65">65</a>  }</div>
+</pre>
+
+        
+
+    </body>
+
+</html>
+

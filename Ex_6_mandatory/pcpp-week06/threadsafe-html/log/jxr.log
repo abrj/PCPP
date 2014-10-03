@@ -1,0 +1,21 @@
+Scanning /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06
+parsing... TestAccountDeadlock.java
+parsing... TestAccountLockOrder.java
+parsing... TestAccountTryLock.java
+parsing... TestAccountUnsafe.java
+parsing... TestCountPrimesStream.java
+parsing... TestListHelper.java
+parsing... TestPhilosophers.java
+parsing... TestStreams.java
+parsing... ts/accounts/UnsafeAccount.java
+parsing... ts/guardedby/TestGuardedBy.java
+/Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/TestAccountDeadlock.java -> /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/threadsafe-html/jxr/TestAccountDeadlock.html
+/Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/TestAccountLockOrder.java -> /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/threadsafe-html/jxr/TestAccountLockOrder.html
+/Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/TestAccountTryLock.java -> /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/threadsafe-html/jxr/TestAccountTryLock.html
+/Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/TestAccountUnsafe.java -> /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/threadsafe-html/jxr/TestAccountUnsafe.html
+/Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/TestCountPrimesStream.java -> /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/threadsafe-html/jxr/TestCountPrimesStream.html
+/Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/TestListHelper.java -> /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/threadsafe-html/jxr/TestListHelper.html
+/Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/TestPhilosophers.java -> /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/threadsafe-html/jxr/TestPhilosophers.html
+/Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/TestStreams.java -> /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/threadsafe-html/jxr/TestStreams.html
+/Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/ts/accounts/UnsafeAccount.java -> /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/threadsafe-html/jxr/ts/accounts/UnsafeAccount.html
+/Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/ts/guardedby/TestGuardedBy.java -> /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/threadsafe-html/jxr/ts/guardedby/TestGuardedBy.html
