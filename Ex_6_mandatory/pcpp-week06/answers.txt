@@ -92,4 +92,3 @@ The method addAll() needs to lock on both this and hist objects, since it needs 
 
 - 6.4.3
 ThreadSafe raises a warning, based on the access to the public field counts. Making this field public, violates the rules of synchronization, as this field can now be accessed (and changed) by other classes without the need of synchronization which is no longer enforced, due to the missing synchronized get method.
-
