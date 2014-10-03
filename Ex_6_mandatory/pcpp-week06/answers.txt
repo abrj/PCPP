@@ -82,3 +82,14 @@ TestPhilosophers.java
 We can observe that every philosophers gets to eat. But they do not eat the same amount, because when a philosophers tries to eat, he pickes up the left fork and if he cannot get the right, he drops both forks, leaving him without food.
 
 ### 6.4 ###
+- 6.4.1 
+When all methods are synchronized, the Histogram2 class passes the ThreadSafe check.
+When deleting synchronized from increment(), ThreadSafe raises an annotation-violation. 
+ThreadSafe does expect syncronization of the getSpan() method.
+
+- 6.4.2
+The method addAll() needs to lock on both this and hist objects, since it needs to read from both objects. ThreadSafe doesn't raise any violations, when locking on both objects.
+
+- 6.4.3
+ThreadSafe raises a warning, based on the access to the public field counts. Making this field public, violates the rules of synchronization, as this field can now be accessed (and changed) by other classes without the need of synchronization which is no longer enforced, due to the missing synchronized get method.
+
