@@ -14,12 +14,30 @@
 
 // This solution is wrong; it will deadlock after a while.
 
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class TestPhilosophers {
   public static void main(String[] args) {
     Fork[] forks = { new Fork(), new Fork(), new Fork(), new Fork(), new Fork() };
+    Philosopher[] phils = new Philosopher[forks.length];
     for (int place=0; place<forks.length; place++) {
-      Thread phil = new Thread(new Philosopher(forks, place));
+      Philosopher p = new Philosopher(forks, place);
+      phils[place] = p;
+      Thread phil = new Thread(p);
       phil.start();
+    }
+    while(true){
+      int i = 0;
+      try{
+        Thread.sleep(10000);
+        for(Philosopher p : phils){
+          System.out.println("phil: " + i++ + " has eaten" + p.ai);
+        }
+      }
+      catch (Exception e) {
+         // 
+      }
     }
   }
 }
@@ -27,13 +45,16 @@ public class TestPhilosophers {
 class Philosopher implements Runnable {
   private final Fork[] forks;
   private final int place;
+  public AtomicInteger ai = new AtomicInteger();
+
 
   public Philosopher(Fork[] forks, int place) {
     this.forks = forks;
     this.place = place;
   }
 
-  public void run() {
+  //Ex 6.2.4
+  public void run2() {
     while (true) {
       // Take the two forks to the left and the right
       int left = place, right = (place+1) % forks.length;
@@ -41,7 +62,8 @@ class Philosopher implements Runnable {
         synchronized(forks[left]){
           synchronized(forks[right]){
             // Eat
-            System.out.print(place + " ");            
+            System.out.print(place + " ");
+            // ai.getAndIncrement();
           }
         }
       }
@@ -50,7 +72,9 @@ class Philosopher implements Runnable {
         synchronized(forks[right]){
           synchronized(forks[left]){
             // Eat
-            System.out.print(place + " ");            
+            System.out.print(place + " ");
+            // ai.getAndIncrement();
+            
           }
         }
       }
@@ -59,7 +83,36 @@ class Philosopher implements Runnable {
       catch (InterruptedException exn) { }
     }
   }
-}
 
-class Fork { }
+  //Ex 6.2.5
+  public void run() {
+    while (true) {
+      // Take the two forks to the left and the right
+      int left = place, right = (place+1) % forks.length;
+          if(forks[left].tryLock()){
+            try{
+              if(forks[right].tryLock()){
+                try{
+                  // Eat
+                  // System.out.print(place + " ");
+                  ai.getAndIncrement();
+
+                }
+                finally{
+                  forks[right].unlock();
+                }
+              }
+            }
+            finally{
+              forks[left].unlock();
+            }
+          }
+
+      // Think
+      try { Thread.sleep(10); }
+      catch (InterruptedException exn) { }
+    }
+  }
+}
+class Fork extends ReentrantLock { }
 
