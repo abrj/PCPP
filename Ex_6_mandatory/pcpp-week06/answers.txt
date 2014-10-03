@@ -81,3 +81,4 @@ TestPhilosophers.java
 - 6.2.5
 We can observe that every philosophers gets to eat. But they do not eat the same amount, because when a philosophers tries to eat, he pickes up the left fork and if he cannot get the right, he drops both forks, leaving him without food.
 
+### 6.4 ###
