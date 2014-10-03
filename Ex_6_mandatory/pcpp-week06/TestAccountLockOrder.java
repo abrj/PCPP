@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.Random;
 
 public class TestAccountLockOrder {
+ 
   public static void main(String[] args) {
     final Account account1 = new Account(), account2 = new Account();
     final Random rnd = new Random();
@@ -38,13 +39,13 @@ public class TestAccountLockOrder {
     Thread clerk1 = new Thread(new Runnable() {
         public void run() { 
           for (int i=0; i<transfers; i++) 
-            account1.transferD(account2, rnd.nextInt(10000));
+            account1.transferE(account2, rnd.nextInt(10000));
         }
       });
     Thread clerk2 = new Thread(new Runnable() {
         public void run() { 
           for (int i=0; i<transfers; i++) 
-            account2.transferD(account1, rnd.nextInt(10000));
+            account2.transferE(account1, rnd.nextInt(10000));
         }
       });
     clerk1.start(); clerk2.start();
@@ -53,11 +54,11 @@ public class TestAccountLockOrder {
       try { Thread.sleep(10); } catch (InterruptedException exn) { }
       // Locking both accounts is necessary to avoid reading the
       // balance in the middle of a transfer.
-      System.out.println(Account.balanceSumD(account1, account2));
+      System.out.println(Account.balanceSumE(account1, account2));
     }
     // The auditor prints the account balance sum when the clerks are finished: 
     try { clerk1.join(); clerk2.join(); } catch (InterruptedException exn) { }
-    System.out.println("\nFinal sum is " + Account.balanceSumD(account1, account2));
+    System.out.println("\nFinal sum is " + Account.balanceSumE(account1, account2));
   }
 }
 
@@ -65,6 +66,7 @@ public class TestAccountLockOrder {
 class Account {
   private static final AtomicInteger intSequence = new AtomicInteger();
   private final int serial = intSequence.getAndIncrement();
+  private static final Object tieLock = new Object();
   
   private long balance = 0;
 
@@ -109,27 +111,49 @@ class Account {
   // case may be handled using a third lock, as in Goetz p. 209.
   public void transferE(Account that, final long amount) {
     Account ac1 = this, ac2 = that;
-    if (System.identityHashCode(ac1) <= System.identityHashCode(ac2))
+    if (System.identityHashCode(ac1) < System.identityHashCode(ac2))
       synchronized (ac1) { synchronized (ac2) { // ac1 <= ac2
           ac1.balance = ac1.balance - amount;
           ac2.balance = ac2.balance + amount;
         } }
-    else
+    else if(System.identityHashCode(ac1) > System.identityHashCode(ac2)){
       synchronized (ac2) { synchronized (ac1) { // ac2 < ac1
           ac1.balance = ac1.balance - amount;
           ac2.balance = ac2.balance + amount;
         } }
+      }
+    else{  //If case the two Account objects have the same 
+      synchronized(tieLock){
+        synchronized(ac1){
+          synchronized(ac2){
+            ac1.balance = ac1.balance - amount;
+            ac2.balance = ac2.balance + amount;
+            }
+          }
+        }
+      }
+
   }
 
   public static long balanceSumE(Account ac1, Account ac2) {
-    if (System.identityHashCode(ac1) <= System.identityHashCode(ac2))
+    if (System.identityHashCode(ac1) < System.identityHashCode(ac2))
       synchronized (ac1) { synchronized (ac2) { // ac1 <= ac2
           return ac1.balance + ac2.balance;
         } }
-    else
+    else if(System.identityHashCode(ac1) > System.identityHashCode(ac2)){
       synchronized (ac2) { synchronized (ac1) { // ac2 < ac1
           return ac1.balance + ac2.balance;
         } }
+      }
+    else{
+      synchronized(tieLock){
+        synchronized(ac1){
+          synchronized(ac2){
+            return ac1.balance + ac2.balance;
+          }
+        }
+      }
+    }
   }
 
   // Use an abstraction that encapsulates the ordered lock-taking.

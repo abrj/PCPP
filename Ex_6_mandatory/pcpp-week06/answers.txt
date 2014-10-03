@@ -1,0 +1,15 @@
+### 6.1 ###
+- 6.1.1
+Yes, it deadlocks. It deadlocks because of transferC(), since two threads are waiting for a lock(that), which are hold by the other thread
+
+- 6.1.2
+We tried to run the TestAccountLockOrder with TransferE and SumE 10 times without any deadlock. A deadlock could occur, if two objects get the same hashcode value and therefore a case where the could end up waiting for each other in the if-condition in line 113.
+
+- 6.1.3
+Yes, it still works without any deadlocks. 
+
+- 6.1.4
+Yes, it would still work and it would still be deadlock-free. However, this solution would not scale, because as soon as you have more than one thread, all thread would be needing the same lock(tieLock), in order to do a transfer or get the balance.
+
+### 6.2 ###
+- 6.2.1
