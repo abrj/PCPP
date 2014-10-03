@@ -1,13 +1,17 @@
 // For week 3
 // sestoft@itu.dk * 2014-09-04
 
+import javax.annotation.concurrent.GuardedBy;
+
 class SimpleHistogram {
   public static void main(String[] args) {
-    final Histogram histogram = new Histogram1(30);
+    //final Histogram histogram = new Histogram2(30);
+    final HistogramMort histogram = new HistogramMort(30);
+
     histogram.increment(7);
     histogram.increment(13);
     histogram.increment(7);
-    dump(histogram);
+    //dump(histogram);
   }
 
   public static void dump(Histogram histogram) {
@@ -50,41 +54,73 @@ class Histogram1 implements Histogram {
 }
 
 class Histogram2 implements Histogram {
+  @GuardedBy("this")
   private int[] counts;
-  public synchronized Histogram1(int span) {
+  public Histogram2(int span) {
     this.counts = new int[span];
   }
   public synchronized void increment(int item) {
-    @GuardedBy("this")
     counts[item] = counts[item] + 1;
   }
 
   public synchronized int getCount(int item) {
-    @GuardedBy("this")
     return counts[item];
   }
   public synchronized int getSpan() {
-    @GuardedBy("this")
     return counts.length;
   }
 
-  public synchronized void addAll(Histogram hist){
-    @GuardedBy("this")
-    if(this.getSpan() = hist.getSpan()){
-      int[] combinedHist = new int[this.getSpan() + hist.getSpan()];
-      int counter = 0;
-      for(int i = 0; i<combinedHist.getSpan(); i++){
-        if(counter < this.getSpan()){ 
-        combinedHist[i] = this.getCount(counter++);
-        }
+  public void addAll(Histogram hist){
+    synchronized(this){
+      synchronized(hist){
+        if(this.getSpan() == hist.getSpan()){
+          Histogram combinedHist = new Histogram2(this.getSpan() + hist.getSpan());
+          int counter = 0;
+          for(int i = 0; i < this.getSpan(); i++){
+            this.counts[i] += hist.getCount(i);
+          }
+        } 
         else{
-          combinedHist[i] = hist.getCount(counter-hist.getSpan());
-          counter++;
+          throw new RuntimeException();
         }
       }
-    } 
-    else{
-      throw new RuntimeException();
+    }
+  }
+}
+
+
+
+class HistogramMort {
+  @GuardedBy("this")
+  public int[] counts;
+  public HistogramMort(int span) {
+    this.counts = new int[span];
+  }
+  public synchronized void increment(int item) {
+    counts[item] = counts[item] + 1;
+  }
+
+  public synchronized int getCount(int item) {
+    return counts[item];
+  }
+  public synchronized int getSpan() {
+    return counts.length;
+  }
+
+  public void addAll(HistogramMort hist){
+    synchronized(this){
+      synchronized(hist){
+        if(this.getSpan() == hist.getSpan()){
+          HistogramMort combinedHist = new HistogramMort(this.getSpan() + hist.getSpan());
+          int counter = 0;
+          for(int i = 0; i < this.getSpan(); i++){
+            this.counts[i] += hist.counts[i];
+          }
+        } 
+        else{
+          throw new RuntimeException();
+        }
+      }
     }
   }
 }
