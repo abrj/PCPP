@@ -11,5 +11,67 @@ Yes, it still works without any deadlocks.
 - 6.1.4
 Yes, it would still work and it would still be deadlock-free. However, this solution would not scale, because as soon as you have more than one thread, all thread would be needing the same lock(tieLock), in order to do a transfer or get the balance.
 
+Modified: TestAccountLockOrder.java
+
 ### 6.2 ###
-- 6.2.1
+- 6.2.1 
+It will deadlock in the case of every thread aquires the left fork, leaving all threads waiting for the right fork.
+
+
+- 6.2.2 
+We ran the program 5 times, each waiting between 3-6 minutes, without any deadlocks. The case of a deadlock is very unlikely, since it requires all threads to be interupted in seqeuential order. This will mean that the time for a deadlock will/can vary much. 
+
+- 6.2.3
+The first part of the message from jVisualVM is about which threads is waiting of locks held by other threads. 
+The second part of the message is about which line of code creates the deadlock. And not surprisingly is all created in the same line of code(line 43).
+
+Original message from jVisualVM:
+Found one Java-level deadlock:
+=============================
+"Thread-4":
+  waiting to lock monitor 0x00007ff69187ab48 (object 0x000000076abef920, a Fork),
+  which is held by "Thread-0"
+"Thread-0":
+  waiting to lock monitor 0x00007ff69205b628 (object 0x000000076abef930, a Fork),
+  which is held by "Thread-1"
+"Thread-1":
+  waiting to lock monitor 0x00007ff6920cf7e8 (object 0x000000076abef940, a Fork),
+  which is held by "Thread-2"
+"Thread-2":
+  waiting to lock monitor 0x00007ff6920cf738 (object 0x000000076abef950, a Fork),
+  which is held by "Thread-3"
+"Thread-3":
+  waiting to lock monitor 0x00007ff69187abf8 (object 0x000000076abef960, a Fork),
+  which is held by "Thread-4"
+
+Java stack information for the threads listed above:
+===================================================
+"Thread-4":
+	at Philosopher.run(TestPhilosophers.java:43)
+	- waiting to lock <0x000000076abef920> (a Fork)
+	- locked <0x000000076abef960> (a Fork)
+	at java.lang.Thread.run(Thread.java:745)
+"Thread-0":
+	at Philosopher.run(TestPhilosophers.java:43)
+	- waiting to lock <0x000000076abef930> (a Fork)
+	- locked <0x000000076abef920> (a Fork)
+	at java.lang.Thread.run(Thread.java:745)
+"Thread-1":
+	at Philosopher.run(TestPhilosophers.java:43)
+	- waiting to lock <0x000000076abef940> (a Fork)
+	- locked <0x000000076abef930> (a Fork)
+	at java.lang.Thread.run(Thread.java:745)
+"Thread-2":
+	at Philosopher.run(TestPhilosophers.java:43)
+	- waiting to lock <0x000000076abef950> (a Fork)
+	- locked <0x000000076abef940> (a Fork)
+	at java.lang.Thread.run(Thread.java:745)
+"Thread-3":
+	at Philosopher.run(TestPhilosophers.java:43)
+	- waiting to lock <0x000000076abef960> (a Fork)
+	- locked <0x000000076abef950> (a Fork)
+	at java.lang.Thread.run(Thread.java:745)
+
+Found 1 deadlock.
+
+- 6.2.4
