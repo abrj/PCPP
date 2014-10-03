@@ -1,4 +1,4 @@
-INFO: Analyser start at 2014-09-03 11:12:51 (UTC)
+INFO: Analyser start at 2014-09-03 12:05:32 (UTC)
 INFO: Constructing classpaths for analysis
 INFO: Analysis classpath: [Directory "/Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/."]
 INFO: Library classpath: [Jarfile "/Library/Java/JavaVirtualMachines/jdk1.8.0_20.jdk/Contents/Home/jre/lib/rt.jar"]
@@ -8,10 +8,20 @@ INFO: Reading class "Fork"
 INFO: Class "Fork" discovered in analysis classpath; no matching stub class
 INFO: Reading class "java/lang/Object"
 INFO: Class "java/lang/Object" discovered in library classpath; replaced by stub class
+INFO: Reading class "Histogram"
+INFO: Class "Histogram" discovered in analysis classpath; no matching stub class
+INFO: Reading class "Histogram1"
+INFO: Class "Histogram1" discovered in analysis classpath; no matching stub class
+INFO: Reading class "Histogram2"
+INFO: Class "Histogram2" discovered in analysis classpath; no matching stub class
+INFO: Reading class "HistogramMort"
+INFO: Class "HistogramMort" discovered in analysis classpath; no matching stub class
 INFO: Reading class "Philosopher"
 INFO: Class "Philosopher" discovered in analysis classpath; no matching stub class
 INFO: Reading class "java/lang/Runnable"
 INFO: Class "java/lang/Runnable" discovered in library classpath; replaced by stub class
+INFO: Reading class "SimpleHistogram"
+INFO: Class "SimpleHistogram" discovered in analysis classpath; no matching stub class
 INFO: Reading class "TestPhilosophers"
 INFO: Class "TestPhilosophers" discovered in analysis classpath; no matching stub class
 INFO: Reading class "ts/guardedby/LongCounter"
@@ -20,7 +30,7 @@ INFO: Reading class "ts/guardedby/TestGuardedBy$1"
 INFO: Class "ts/guardedby/TestGuardedBy$1" discovered in analysis classpath; no matching stub class
 INFO: Reading class "ts/guardedby/TestGuardedBy"
 INFO: Class "ts/guardedby/TestGuardedBy" discovered in analysis classpath; no matching stub class
-INFO: Analysing package "ts.guardedby" at 2014-09-03 11:12:51 (UTC)
+INFO: Analysing package "ts.guardedby" at 2014-09-03 12:05:32 (UTC)
 INFO: Analysing class "ts/guardedby/LongCounter"
 INFO: Reading class "LongCounter"
 WARN: Class "LongCounter" not found
@@ -35,20 +45,24 @@ INFO: Reading class "java/lang/String"
 INFO: Class "java/lang/String" discovered in library classpath; replaced by stub class
 INFO: Reading class "java/lang/CharSequence"
 INFO: Class "java/lang/CharSequence" discovered in library classpath; replaced by stub class
-INFO: Running FieldClassifier at 2014-09-03 11:12:51 (UTC)
-INFO: Running ThreadStructure at 2014-09-03 11:12:51 (UTC)
-INFO: Running FieldAccesses.Fields at 2014-09-03 11:12:51 (UTC)
-INFO: Running FieldAccesses.Arrays at 2014-09-03 11:12:51 (UTC)
-INFO: Running FieldAccesses.Collections at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_ReusableObjectSync at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_UnsafeIteration at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_TryLock at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_GetCheckPut at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_UnsafeContent at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_UnreleasedLocks at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_Deadlock at 2014-09-03 11:12:51 (UTC)
-INFO: Analysing package "" at 2014-09-03 11:12:51 (UTC)
+INFO: Running FieldClassifier at 2014-09-03 12:05:32 (UTC)
+INFO: Running ThreadStructure at 2014-09-03 12:05:32 (UTC)
+INFO: Running FieldAccesses.Fields at 2014-09-03 12:05:32 (UTC)
+INFO: Running FieldAccesses.Arrays at 2014-09-03 12:05:32 (UTC)
+INFO: Running FieldAccesses.Collections at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_ReusableObjectSync at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_UnsafeIteration at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_TryLock at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_GetCheckPut at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_UnsafeContent at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_UnreleasedLocks at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_Deadlock at 2014-09-03 12:05:32 (UTC)
+INFO: Analysing package "" at 2014-09-03 12:05:32 (UTC)
 INFO: Analysing class "Fork"
+INFO: Analysing class "Histogram"
+INFO: Analysing class "Histogram1"
+INFO: Analysing class "Histogram2"
+INFO: Analysing class "HistogramMort"
 INFO: Analysing class "Philosopher"
 INFO: Reading class "java/lang/System"
 INFO: Class "java/lang/System" discovered in library classpath; replaced by stub class
@@ -60,12 +74,15 @@ INFO: Reading class "java/io/PrintStream"
 INFO: Class "java/io/PrintStream" discovered in library classpath; no matching stub class
 INFO: Reading class "java/lang/Thread"
 INFO: Class "java/lang/Thread" discovered in library classpath; replaced by stub class
+INFO: Analysing class "SimpleHistogram"
+INFO: Reading class "java/lang/Integer"
+INFO: Class "java/lang/Integer" discovered in library classpath; replaced by stub class
 INFO: Analysing class "TestPhilosophers"
-INFO: Running FieldClassifier at 2014-09-03 11:12:51 (UTC)
-INFO: Running ThreadStructure at 2014-09-03 11:12:51 (UTC)
-INFO: Running FieldAccesses.Fields at 2014-09-03 11:12:51 (UTC)
-INFO: Running FieldAccesses.Arrays at 2014-09-03 11:12:51 (UTC)
-INFO: Running FieldAccesses.Collections at 2014-09-03 11:12:51 (UTC)
+INFO: Running FieldClassifier at 2014-09-03 12:05:32 (UTC)
+INFO: Running ThreadStructure at 2014-09-03 12:05:32 (UTC)
+INFO: Running FieldAccesses.Fields at 2014-09-03 12:05:32 (UTC)
+INFO: Running FieldAccesses.Arrays at 2014-09-03 12:05:32 (UTC)
+INFO: Running FieldAccesses.Collections at 2014-09-03 12:05:32 (UTC)
 INFO: Reading class "java/lang/Appendable"
 INFO: Class "java/lang/Appendable" discovered in library classpath; no matching stub class
 INFO: Reading class "java/io/Closeable"
@@ -78,23 +95,23 @@ INFO: Reading class "java/io/OutputStream"
 INFO: Class "java/io/OutputStream" discovered in library classpath; no matching stub class
 INFO: Reading class "java/io/Flushable"
 INFO: Class "java/io/Flushable" discovered in library classpath; no matching stub class
-INFO: Running Checker_ReusableObjectSync at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_UnsafeIteration at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_TryLock at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_GetCheckPut at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_UnsafeContent at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_UnreleasedLocks at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_Deadlock at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_ConsistentlyGuarded at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_InconsistentSync (fields) at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_InconsistentSync (arrays) at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_InconsistentSync (collections) at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_UnsafeRemoval at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_LockedBlocking at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_FieldLockOverwritten at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_UnsafeReplacement at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_ReadOnlyVolatile at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_BadCatches at 2014-09-03 11:12:51 (UTC)
+INFO: Running Checker_ReusableObjectSync at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_UnsafeIteration at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_TryLock at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_GetCheckPut at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_UnsafeContent at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_UnreleasedLocks at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_Deadlock at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_ConsistentlyGuarded at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_InconsistentSync (fields) at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_InconsistentSync (arrays) at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_InconsistentSync (collections) at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_UnsafeRemoval at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_LockedBlocking at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_FieldLockOverwritten at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_UnsafeReplacement at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_ReadOnlyVolatile at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_BadCatches at 2014-09-03 12:05:32 (UTC)
 INFO: Reading class "java/lang/InterruptedException"
 INFO: Class "java/lang/InterruptedException" discovered in library classpath; no matching stub class
 INFO: Reading class "java/lang/Exception"
@@ -103,9 +120,9 @@ INFO: Reading class "java/lang/Throwable"
 INFO: Class "java/lang/Throwable" discovered in library classpath; no matching stub class
 INFO: Reading class "java/io/Serializable"
 INFO: Class "java/io/Serializable" discovered in library classpath; no matching stub class
-INFO: Running Checker_GuardedBy at 2014-09-03 11:12:51 (UTC)
-INFO: Running Checker_Deadlock at 2014-09-03 11:12:51 (UTC)
+INFO: Running Checker_GuardedBy at 2014-09-03 12:05:32 (UTC)
+INFO: Running Checker_Deadlock at 2014-09-03 12:05:32 (UTC)
 INFO: 0 findings discovered in this run
-INFO: Analyser finish at 2014-09-03 11:12:51 (UTC)
-INFO: Max heap size (bytes) 190464
+INFO: Analyser finish at 2014-09-03 12:05:32 (UTC)
+INFO: Max heap size (bytes) 222208
 INFO: Exit code: 0

@@ -1,4 +1,5 @@
 Scanning /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06
+parsing... SimpleHistogram.java
 parsing... TestAccountDeadlock.java
 parsing... TestAccountLockOrder.java
 parsing... TestAccountTryLock.java
@@ -9,6 +10,7 @@ parsing... TestPhilosophers.java
 parsing... TestStreams.java
 parsing... ts/accounts/UnsafeAccount.java
 parsing... ts/guardedby/TestGuardedBy.java
+/Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/SimpleHistogram.java -> /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/threadsafe-html/jxr/SimpleHistogram.html
 /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/TestAccountDeadlock.java -> /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/threadsafe-html/jxr/TestAccountDeadlock.html
 /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/TestAccountLockOrder.java -> /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/threadsafe-html/jxr/TestAccountLockOrder.html
 /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/TestAccountTryLock.java -> /Users/Thomsen/Dropbox/ITU/7. Semester/PPCP/Git/Ex_6_mandatory/pcpp-week06/threadsafe-html/jxr/TestAccountTryLock.html
