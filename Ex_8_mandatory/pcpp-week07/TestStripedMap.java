@@ -19,9 +19,6 @@ public class TestStripedMap {
     exerciseAllMaps();
     // timeAllMaps();
 
-    //TEST FOR 7.1
-
-    //TEST FOR 7.2
   }
 
   private static void timeAllMaps() {
