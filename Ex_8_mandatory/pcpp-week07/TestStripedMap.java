@@ -10,6 +10,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicIntegerArray;
+import java.util.*;
 
 public class TestStripedMap {
   public static void main(String[] args) {
@@ -17,6 +18,10 @@ public class TestStripedMap {
     testAllMaps();    // Must be run with: java -ea TestStripedMap 
     exerciseAllMaps();
     // timeAllMaps();
+
+    //TEST FOR 7.1
+
+    //TEST FOR 7.2
   }
 
   private static void timeAllMaps() {
@@ -427,8 +432,16 @@ class StripedMap<K,V> implements OurMap<K,V> {
 
   // Return value v associated with key k, or null
   public V get(K k) {
-    // TO DO: IMPLEMENT
+    if(containsKey(k)){
+    final int h = getHash(k), stripe = h % lockCount;
+    synchronized (locks[stripe]) {
+       final int hash = h % buckets.length;
+       return ItemNode.search(buckets[hash], k);
+      }
+    }
+    //The key is not found...
     return null;
+    
   }
 
   public int size() {
