@@ -430,6 +430,7 @@ class StripedMap<K,V> implements OurMap<K,V> {
     }
   }
 
+  //Ex 7.1.1
   // Return value v associated with key k, or null
   public V get(K k) {
     if(containsKey(k)){
@@ -445,9 +446,15 @@ class StripedMap<K,V> implements OurMap<K,V> {
     
   }
 
+  //Ex 7.1.2
   public int size() {
-    // TO DO: IMPLEMENT
-    return 0;
+    int res = 0;
+    for(int i = 0; i < sizes.length; i++){
+      synchronized(locks[i]){
+        res += sizes[i];
+      }
+    }
+    return res;
   }
 
   // Put v at key k, or update if already present 
