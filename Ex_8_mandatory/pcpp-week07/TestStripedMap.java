@@ -491,12 +491,36 @@ class StripedMap<K,V> implements OurMap<K,V> {
     }
   }
 
-
+  //Ex 7.1.4
   // Remove and return the value at key k if any, else return null
   public V remove(K k) {
-    // TO DO: IMPLEMENT
-    return null;
+    final int h = getHash(k), stripe = h % lockCount;
+    ItemNode<K,V> prev = buckets[stripe];
+    if (prev == null) 
+      return null;
+    else if (k.equals(prev.k)) {       // Delete first ItemNode
+      synchronized(locks[stripe]){
+        V old = prev.v;
+        sizes[stripe]--; 
+        buckets[stripe] = prev.next;
+        return old;
+      }
+    } else {                            // Search later ItemNodes
+      while (prev.next != null && !k.equals(prev.next.k))
+        prev = prev.next;
+      // Now prev.next == null || k.equals(prev.next.k)
+      if (prev.next != null) {  // Delete ItemNode prev.next
+        synchronized(locks[stripe]){
+          V old = prev.next.v;
+          sizes[stripe]--; 
+          prev.next = prev.next.next;
+          return old;
+        }
+      } else
+        return null;
+    }
   }
+
 
   // Iterate over the hashmap's entries one stripe at a time; less locking
   public void forEach(Consumer<K,V> consumer) {
