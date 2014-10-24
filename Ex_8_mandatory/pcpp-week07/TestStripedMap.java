@@ -475,11 +475,22 @@ class StripedMap<K,V> implements OurMap<K,V> {
     }
   }
 
+  //Ex 7.1.3
   // Put v at key k only if absent
   public V putIfAbsent(K k, V v) {
-    // TO DO: IMPLEMENT
-    return null;
+    final int h = getHash(k), stripe = h % lockCount;
+    ItemNode<K,V> node = ItemNode.search(buckets[stripe], k);
+    if (node != null)
+      return node.v;
+    else {
+      synchronized(locks[stripe]){
+      buckets[stripe] = new ItemNode<K,V>(k, v, buckets[stripe]);
+      sizes[stripe]++;
+      return null;
+      }
+    }
   }
+
 
   // Remove and return the value at key k if any, else return null
   public V remove(K k) {
