@@ -171,10 +171,10 @@ public class TestStripedMap {
   }
 
   private static void testAllMaps() {
-    testMap(new SynchronizedMap<Integer,String>(25));
+    // testMap(new SynchronizedMap<Integer,String>(25));
     testMap(new StripedMap<Integer,String>(25, 5));
-    testMap(new StripedWriteMap<Integer,String>(25, 5));
-    testMap(new WrapConcurrentHashMap<Integer,String>());
+    // testMap(new StripedWriteMap<Integer,String>(25, 5));
+    // testMap(new WrapConcurrentHashMap<Integer,String>());
   }
 
   // --- Benchmarking infrastructure ---
@@ -521,10 +521,19 @@ class StripedMap<K,V> implements OurMap<K,V> {
     }
   }
 
-
+  //Ex 7.1.5
   // Iterate over the hashmap's entries one stripe at a time; less locking
   public void forEach(Consumer<K,V> consumer) {
-    // TO DO: IMPLEMENT
+    final ItemNode<K,V>[] bs = buckets;        
+    for(int i = 0; i<lockCount; i++){
+      synchronized(locks[i]){
+        ItemNode<K,V> itemNode = buckets[i];
+        while(itemNode != null){
+        consumer.accept(itemNode.k, itemNode.v);
+        itemNode = itemNode.next;
+        } 
+      }
+    }
   }
 
   // First lock all stripes.  Then double bucket table size, rehash,
