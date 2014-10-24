@@ -435,8 +435,9 @@ class StripedMap<K,V> implements OurMap<K,V> {
     if(containsKey(k)){
     final int h = getHash(k), stripe = h % lockCount;
     synchronized (locks[stripe]) {
-       final int hash = h % buckets.length;
-       return ItemNode.search(buckets[hash], k);
+        final int hash = h % buckets.length;
+        ItemNode<K,V> node = ItemNode.search(buckets[hash], k);
+        return node.v;
       }
     }
     //The key is not found...
