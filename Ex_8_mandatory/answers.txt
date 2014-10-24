@@ -1,0 +1,11 @@
+7.1.1: See TestStriped.java
+
+7.1.2: See TestStriped.java
+It is important to lock the sizes array when reading because
+sizes is updated in the put method.
+
+7.1.3: See TestStriped.java
+
+7.1.4: See TestStriped.java
+
+7.1.5: See TestStriped.java
