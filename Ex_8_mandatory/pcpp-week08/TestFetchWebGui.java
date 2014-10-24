@@ -90,25 +90,32 @@ public class TestFetchWebGui {
     textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
     outerPanel.add(textArea, BorderLayout.WEST);
     // (1) Use a background thread, not the event thread, for work
-    DownloadWorker downloadTask = new DownloadWorker(textArea);
-    fetchButton.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          downloadTask.execute();
-        }});
+    final DownloadWorker[] tasks = new DownloadWorker[urls.length];
+    for(int i = 0; i < urls.length ; i++){
+      DownloadWorker downloadTask = new DownloadWorker(textArea, urls[i], urls.length);
+      tasks[i] = downloadTask;
+      fetchButton.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            downloadTask.execute();
+          }});
+    }
     // (2) Add a progress bar
     JProgressBar progressBar = new JProgressBar(0, 100);
     outerPanel.add(progressBar, BorderLayout.SOUTH);
-    downloadTask.addPropertyChangeListener(new PropertyChangeListener() {
-        public void propertyChange(PropertyChangeEvent e) {
-          if ("progress".equals(e.getPropertyName())) {
-            progressBar.setValue((Integer)e.getNewValue());
-          }}});
-    // (3) Enable cancellation
-    cancelButton.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          downloadTask.cancel(false);
-        }});
-    frame.pack(); frame.setVisible(true);
+    for(DownloadWorker downloadTask : tasks){
+      downloadTask.addPropertyChangeListener(new PropertyChangeListener() {
+          public void propertyChange(PropertyChangeEvent e) {
+            if ("progress".equals(e.getPropertyName())) {
+              progressBar.setValue((Integer)e.getNewValue());
+            }}});
+
+      // (3) Enable cancellation
+      cancelButton.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            downloadTask.cancel(false);
+          }});
+      frame.pack(); frame.setVisible(true);
+    }
   }
 
   private static final String[] urls = 
@@ -143,27 +150,32 @@ public class TestFetchWebGui {
   }
 
   static class DownloadWorker extends SwingWorker<String,String> {
-    private final TextArea textArea; 
+    private final TextArea textArea;
+    private String url; 
+    private int numUrls;
+    private static double progress = 0;
 
-    public DownloadWorker(TextArea textArea) {
+    public DownloadWorker(TextArea textArea, String url, int urls) {
       this.textArea = textArea;
+      this.url = url;
+      numUrls = urls;
     }
 
     // Called on a separate worker thread, not the event thread, and
     // hence cannot write to textArea.
     public String doInBackground() {
+      
       StringBuilder sb = new StringBuilder();
       int count = 0;
-      for (String url : urls) {
-        if (isCancelled())
-          break;
-        System.out.println("Fetching " + url);
-        String page = getPage(url, 200),
-          result = String.format("%-40s%7d%n", url, page.length());
-        // sb.append(result); // (1)
-        setProgress((100 * ++count) / urls.length); // (2)
-        publish(result); // (4)
-      }
+      if (isCancelled())
+          return null;
+      System.out.println("Fetching " + url);
+      String page = getPage(url, 200),
+      result = String.format("%-40s%7d%n", url, page.length());
+      if (isCancelled())
+          return null;
+      publish(result); // (4)
+
       return sb.toString();
     }
   
@@ -172,6 +184,11 @@ public class TestFetchWebGui {
     public void process(List<String> results) {
       for (String result : results)
         textArea.append(result);
+      double value = 100.0 / numUrls;
+      progress += value;
+      if(progress > 99.99)
+        progress = 100.0;
+      setProgress((int)progress);
     }
 
     // Called in the event thread when done() has terminated, whether
