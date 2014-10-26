@@ -430,16 +430,14 @@ class StripedMap<K,V> implements OurMap<K,V> {
   //Ex 7.1.1
   // Return value v associated with key k, or null
   public V get(K k) {
-    if(containsKey(k)){
     final int h = getHash(k), stripe = h % lockCount;
     synchronized (locks[stripe]) {
         final int hash = h % buckets.length;
         ItemNode<K,V> node = ItemNode.search(buckets[hash], k);
+        if(node == null)
+          return null;
         return node.v;
       }
-    }
-    //The key is not found...
-    return null;
     
   }
 
@@ -476,12 +474,13 @@ class StripedMap<K,V> implements OurMap<K,V> {
   // Put v at key k only if absent
   public V putIfAbsent(K k, V v) {
     final int h = getHash(k), stripe = h % lockCount;
-    ItemNode<K,V> node = ItemNode.search(buckets[stripe], k);
+    int hash = h % buckets.length;
+    ItemNode<K,V> node = ItemNode.search(buckets[hash], k);
     if (node != null)
       return node.v;
     else {
       synchronized(locks[stripe]){
-      buckets[stripe] = new ItemNode<K,V>(k, v, buckets[stripe]);
+      buckets[stripe] = new ItemNode<K,V>(k, v, buckets[hash]);
       sizes[stripe]++;
       return null;
       }
@@ -492,43 +491,44 @@ class StripedMap<K,V> implements OurMap<K,V> {
   // Remove and return the value at key k if any, else return null
   public V remove(K k) {
     final int h = getHash(k), stripe = h % lockCount;
-    ItemNode<K,V> prev = buckets[stripe];
-    if (prev == null) 
-      return null;
-    else if (k.equals(prev.k)) {       // Delete first ItemNode
-      synchronized(locks[stripe]){
+    synchronized(locks[stripe]){
+      int hash = h % buckets.length;
+      ItemNode<K,V> prev = buckets[hash];
+      if (prev == null) 
+        return null;
+      else if (k.equals(prev.k)) {       // Delete first ItemNode
         V old = prev.v;
         sizes[stripe]--; 
-        buckets[stripe] = prev.next;
+        buckets[hash] = prev.next;
         return old;
-      }
-    } else {                            // Search later ItemNodes
-      while (prev.next != null && !k.equals(prev.next.k))
-        prev = prev.next;
-      // Now prev.next == null || k.equals(prev.next.k)
-      if (prev.next != null) {  // Delete ItemNode prev.next
-        synchronized(locks[stripe]){
-          V old = prev.next.v;
-          sizes[stripe]--; 
-          prev.next = prev.next.next;
-          return old;
+      } else {                            // Search later ItemNodes
+        while (prev.next != null && !k.equals(prev.next.k)){
+          prev = prev.next;
+          // Now prev.next == null || k.equals(prev.next.k)
+          if (prev.next != null) {  // Delete ItemNode prev.next
+            V old = prev.next.v;
+            sizes[stripe]--; 
+            prev.next = prev.next.next;
+            return old;
+          }
         }
-      } else
-        return null;
+      }
     }
+  return null;
   }
 
   //Ex 7.1.5
   // Iterate over the hashmap's entries one stripe at a time; less locking
-  public void forEach(Consumer<K,V> consumer) {
-    final ItemNode<K,V>[] bs = buckets;        
+  public void forEach(Consumer<K,V> consumer) {      
     for(int i = 0; i<lockCount; i++){
       synchronized(locks[i]){
-        ItemNode<K,V> itemNode = buckets[i];
-        while(itemNode != null){
-        consumer.accept(itemNode.k, itemNode.v);
-        itemNode = itemNode.next;
-        } 
+        for(int j = i; j < buckets.length; j++){
+          ItemNode<K,V> itemNode = buckets[j];
+          while(itemNode != null){
+            consumer.accept(itemNode.k, itemNode.v);
+            itemNode = itemNode.next;
+          } 
+        }
       }
     }
   }
