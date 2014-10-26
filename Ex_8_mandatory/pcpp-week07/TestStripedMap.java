@@ -656,11 +656,11 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
     return null;
   }
 
-  //Ex 7.1.2
+  //Ex 7.2.1
   public int size() {
     int res = 0;
-    for(int i = 0; i < sizes.length; i++){
-        res += sizes[i];
+    for(int i = 0; i < lockCount; i++){
+        res += sizes.get(i);
     }
     return res;
   }
