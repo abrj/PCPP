@@ -157,6 +157,7 @@ public class TestFetchWebGui {
       for (String url : urls) {
         if (isCancelled())
           break;
+        new 
         System.out.println("Fetching " + url);
         String page = getPage(url, 200),
           result = String.format("%-40s%7d%n", url, page.length());
