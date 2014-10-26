@@ -656,9 +656,13 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
     return null;
   }
 
+  //Ex 7.1.2
   public int size() {
-    // TO DO: IMPLEMENT
-    return 0;
+    int res = 0;
+    for(int i = 0; i < sizes.length; i++){
+        res += sizes[i];
+    }
+    return res;
   }
 
   // Put v at key k, or update if already present 
