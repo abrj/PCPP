@@ -10,6 +10,10 @@ sizes is updated in the put method.
 
 7.1.5: See TestStriped.java
 
+7.1.6: The tests pass without errors.
+
+7.1.7: 
+
 
 8.3.1
 We chose implementation 1 with multiple DownloadWorkers.

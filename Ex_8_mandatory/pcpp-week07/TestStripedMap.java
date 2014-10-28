@@ -34,7 +34,7 @@ public class TestStripedMap {
           new IntToDouble() { public double call(int i) {
             return timeMap(threadCount, 
                            new StripedMap<Integer,String>(bucketCount, lockCount));
-          }});
+          }});/*
       Mark7(String.format("%-21s %d", "StripedWriteMap", threadCount), 
           new IntToDouble() { public double call(int i) {
             return timeMap(threadCount, 
@@ -44,7 +44,7 @@ public class TestStripedMap {
           new IntToDouble() { public double call(int i) {
             return timeMap(threadCount, 
                            new WrapConcurrentHashMap<Integer,String>());
-          }});
+          }});*/
     }
   }
 
