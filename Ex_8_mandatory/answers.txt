@@ -13,6 +13,29 @@ sizes is updated in the put method.
 7.1.6: The tests pass without errors.
 
 7.1.7: 
+SynchronizedMap       16         495719.0 us   37510.31          2
+99992.0
+StripedMap            16        1498813.9 us  261072.45          2
+99992.0
+
+The test shows that StripedMap performs slower than SynchronizedMap,
+which is surprisingly because striped ought to be faster as it only
+locks on a specific stripe, compared to synchronized which locks on
+the entire map all the time.
+
+7.1.8:
+As explained during the lecture, using a non-fixed number of stripes have problems 
+with scalability, compared to using a fixed number of stripes like 16 or 32. 
+
+7.1.9:
+The threads have better chances of aquiring a lock, when more stripes than 
+threads are available, which could mean that a thread could be used more efficient.
+
+7.1.10:
+It is important that the bucketCount is a multiple of lockCount (stripes)
+because it the event that one needs to reallocate buckets, we need to double
+the sizes, and thus doubling the locks, so the same position in the hashmap still
+uses the same stripe lock.
 
 
 8.3.1
