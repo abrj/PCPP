@@ -475,14 +475,14 @@ class StripedMap<K,V> implements OurMap<K,V> {
   public V putIfAbsent(K k, V v) {
     final int h = getHash(k), stripe = h % lockCount;
     int hash = h % buckets.length;
-    ItemNode<K,V> node = ItemNode.search(buckets[hash], k);
-    if (node != null)
-      return node.v;
-    else {
-      synchronized(locks[stripe]){
-      buckets[stripe] = new ItemNode<K,V>(k, v, buckets[hash]);
-      sizes[stripe]++;
-      return null;
+    synchronized(locks[stripe]){
+      ItemNode<K,V> node = ItemNode.search(buckets[hash], k);
+      if (node != null)
+        return node.v;
+      else {
+        buckets[hash] = new ItemNode<K,V>(k, v, buckets[hash]);
+        sizes[stripe]++;
+        return null;
       }
     }
   }
@@ -494,6 +494,7 @@ class StripedMap<K,V> implements OurMap<K,V> {
     synchronized(locks[stripe]){
       int hash = h % buckets.length;
       ItemNode<K,V> prev = buckets[hash];
+
       if (prev == null) 
         return null;
       else if (k.equals(prev.k)) {       // Delete first ItemNode
@@ -504,17 +505,19 @@ class StripedMap<K,V> implements OurMap<K,V> {
       } else {                            // Search later ItemNodes
         while (prev.next != null && !k.equals(prev.next.k)){
           prev = prev.next;
-          // Now prev.next == null || k.equals(prev.next.k)
-          if (prev.next != null) {  // Delete ItemNode prev.next
-            V old = prev.next.v;
-            sizes[stripe]--; 
-            prev.next = prev.next.next;
-            return old;
-          }
+        }
+        // Now prev.next == null || k.equals(prev.next.k)
+        if (prev.next != null) {  // Delete ItemNode prev.next
+          V old = prev.next.v;
+          sizes[stripe]--; 
+          prev.next = prev.next.next;
+          return old;
+        }
+        else{
+          return null;
         }
       }
     }
-  return null;
   }
 
   //Ex 7.1.5
