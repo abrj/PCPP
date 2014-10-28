@@ -15,7 +15,7 @@ import java.util.*;
 public class TestStripedMap {
   public static void main(String[] args) {
     SystemInfo();
-    testAllMaps();    // Must be run with: java -ea TestStripedMap 
+    // testAllMaps();    // Must be run with: java -ea TestStripedMap 
     exerciseAllMaps();
     // timeAllMaps();
 
@@ -169,8 +169,8 @@ public class TestStripedMap {
 
   private static void testAllMaps() {
     // testMap(new SynchronizedMap<Integer,String>(25));
-    testMap(new StripedMap<Integer,String>(25, 5));
-    // testMap(new StripedWriteMap<Integer,String>(25, 5));
+    // testMap(new StripedMap<Integer,String>(25, 5));
+    testMap(new StripedWriteMap<Integer,String>(25, 5));
     // testMap(new WrapConcurrentHashMap<Integer,String>());
   }
 
@@ -655,7 +655,7 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
 
   // Return value v associated with key k, or null
   public V get(K k) {
-    // TO DO: IMPLEMENT
+    //TO DO
     return null;
   }
 
@@ -686,19 +686,53 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
 
   // Put v at key k only if absent
   public V putIfAbsent(K k, V v) {
-    // TO DO: IMPLEMENT
-    return null;
+    final ItemNode<K,V>[] bs = buckets;
+    final int h = getHash(k), stripe = h % lockCount;
+    final int hash = h % bs.length;
+    final Holder<V> old = new Holder<V>();
+    final ItemNode<K,V> node = bs[hash];
+    if(ItemNode.search(node, k, old))
+      //Do nothing
+      return null;
+    else{
+      synchronized(locks[stripe]){
+        buckets[hash] = new ItemNode<K,V>(k, v, bs[hash]);
+        sizes.getAndIncrement(stripe);
+        return old.get();
+      }
+    }
   }
 
   // Remove and return the value at key k if any, else return null
   public V remove(K k) {
-    // TO DO: IMPLEMENT
+    final ItemNode<K,V>[] bs = buckets;
+    final int h = getHash(k), stripe = h % lockCount;
+    final Holder<V> old = new Holder<V>();
+    final int hash = h % bs.length;
+    final ItemNode<K,V> node = bs[hash];
+    if(ItemNode.search(bs[hash], k, old)){
+      final ItemNode<K,V> newNode = ItemNode.delete(bs[hash],k,old);
+      sizes.getAndDecrement(stripe);
+      sizes.getAndAdd(stripe, newNode == node ? 1 : 0);
+      return old.get();
+    }
+    //Do nothing
     return null;
   }
 
   // Iterate over the hashmap's entries one stripe at a time.  
   public void forEach(Consumer<K,V> consumer) {
-    // TO DO: IMPLEMENT
+    final ItemNode<K,V>[] bs = buckets;
+    for(int i = 0; i<lockCount; i++){
+      final int s = bs.length;
+      for(int j=0; j<s; j++){
+        ItemNode<K,V> itemNode = bs[j];
+        while(itemNode != null){
+          consumer.accept(itemNode.k, itemNode.v);
+          itemNode = itemNode.next;
+        }
+      }
+    }    
   }
 
   // First lock all stripes.  Then double bucket table size, rehash,
