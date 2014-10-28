@@ -15,7 +15,11 @@ import java.util.*;
 public class TestStripedMap {
   public static void main(String[] args) {
     SystemInfo();
+<<<<<<< HEAD
     // testAllMaps();    // Must be run with: java -ea TestStripedMap 
+=======
+    //testAllMaps();    // Must be run with: java -ea TestStripedMap 
+>>>>>>> 544c7939e7b250995ad1ddf654e1a527deaa6c55
     exerciseAllMaps();
     // timeAllMaps();
 
@@ -34,7 +38,7 @@ public class TestStripedMap {
           new IntToDouble() { public double call(int i) {
             return timeMap(threadCount, 
                            new StripedMap<Integer,String>(bucketCount, lockCount));
-          }});
+          }});/*
       Mark7(String.format("%-21s %d", "StripedWriteMap", threadCount), 
           new IntToDouble() { public double call(int i) {
             return timeMap(threadCount, 
@@ -44,7 +48,7 @@ public class TestStripedMap {
           new IntToDouble() { public double call(int i) {
             return timeMap(threadCount, 
                            new WrapConcurrentHashMap<Integer,String>());
-          }});
+          }});*/
     }
   }
 
@@ -93,7 +97,7 @@ public class TestStripedMap {
   }
 
   private static void exerciseAllMaps() {
-    final int bucketCount = 100_000, lockCount = 32, threadCount = 16;
+    final int bucketCount = 100_000, lockCount = 16, threadCount = 16;
     final int iterations = 1_600_000, perThread = iterations / threadCount;
     final int range = 100_000;
     System.out.println(Mark7(String.format("%-21s %d", "SynchronizedMap", threadCount),
@@ -105,7 +109,7 @@ public class TestStripedMap {
           new IntToDouble() { public double call(int i) {
             return exerciseMap(threadCount, perThread, range,
                                new StripedMap<Integer,String>(bucketCount, lockCount));
-          }}));
+          }}));/*
     System.out.println(Mark7(String.format("%-21s %d", "StripedWriteMap", threadCount), 
           new IntToDouble() { public double call(int i) {
             return exerciseMap(threadCount, perThread, range,
@@ -115,7 +119,7 @@ public class TestStripedMap {
           new IntToDouble() { public double call(int i) {
             return exerciseMap(threadCount, perThread, range,
                                new WrapConcurrentHashMap<Integer,String>());
-          }}));
+          }}));*/
   }
 
   // Very basic sequential functional test of a hash map.  You must
@@ -684,6 +688,7 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
     }
   }
 
+  //Ex 7.2.3
   // Put v at key k only if absent
   public V putIfAbsent(K k, V v) {
     final ItemNode<K,V>[] bs = buckets;
@@ -703,6 +708,7 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
     }
   }
 
+  //Ex 7.2.4
   // Remove and return the value at key k if any, else return null
   public V remove(K k) {
     final ItemNode<K,V>[] bs = buckets;
@@ -720,6 +726,7 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
     return null;
   }
 
+  //Ex 7.2.5
   // Iterate over the hashmap's entries one stripe at a time.  
   public void forEach(Consumer<K,V> consumer) {
     final ItemNode<K,V>[] bs = buckets;
