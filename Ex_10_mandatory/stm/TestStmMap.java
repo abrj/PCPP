@@ -197,6 +197,7 @@ interface OurMap<K,V> {
 
 class StmMap<K,V> implements OurMap<K,V> {
   private final TxnRef<TxnRef<ItemNode<K,V>>[]> buckets;
+  private TxnInteger size = newTxnInteger(0);
 
   public StmMap(int bucketCount) {
     final TxnRef<ItemNode<K,V>>[] buckets = makeBuckets(bucketCount);
@@ -242,22 +243,56 @@ class StmMap<K,V> implements OurMap<K,V> {
   }
 
   public int size() {
-    throw new RuntimeException("Not implemented");
+    return size.get();
   }
 
   // Put v at key k, or update if already present.  
   public V put(K k, V v) {
-    throw new RuntimeException("Not implemented");
+    final int h = getHash(k), hash = h % buckets.get().length;
+    if(!containsKey(k)){
+      size.increment();
+    }
+      return atomic(new Callable<V>(){public V call(){
+        final Holder<V> old = new Holder<V>();
+        final ItemNode<K,V> node = buckets.get()[hash].get(), 
+          newNode = ItemNode.delete(node, k, old);
+        buckets.get()[hash].set(new ItemNode<K,V>(k, v, newNode));
+        // Write for visibility; increment if k was not already in map
+
+        return old.get();
+    }});
   }
 
   // Put v at key k only if absent.  
   public V putIfAbsent(K k, V v) {
-    throw new RuntimeException("Not implemented");
-  }
+    final int h = getHash(k), hash = h % buckets.get().length;
+      return atomic(new Callable<V>(){public V call(){
+        ItemNode<K,V> node =  buckets.get()[hash].get(); 
+        if (node != null)
+          return node.v;
+        else {
+          buckets.get()[hash].set(new ItemNode<K,V>(k, v, buckets.get()[hash].get()));
+          size.increment();
+          return null;
+        }
+      }});
+    }
+
 
   // Remove and return the value at key k if any, else return null
   public V remove(K k) {
-    throw new RuntimeException("Not implemented");
+    final int h = getHash(k), hash = h % buckets.get().length;
+      return atomic(new Callable<V>(){public V call(){
+        final Holder<V> old = new Holder<V>();
+        final ItemNode<K,V> node = buckets.get()[hash].get();
+        if(ItemNode.search(buckets.get()[hash].get(), k, old)){
+          final ItemNode<K,V> newNode = ItemNode.delete(buckets.get()[hash].get(),k,old);
+          size.decrement();
+          return old.get();
+        }
+        //Do nothing
+        return null;
+      }});
   }
 
   //Ex 10.3.2
