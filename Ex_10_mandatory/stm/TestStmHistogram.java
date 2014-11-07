@@ -27,6 +27,7 @@ class TestStmHistogram {
 
   private static void countPrimeFactorsWithStmHistogram() {
     final Histogram histogram = new StmHistogram(30);
+    final Histogram total = new StmHistogram(30);
     final int range = 4_000_000;
     final int threadCount = 10, perThread = range / threadCount;
     final CyclicBarrier startBarrier = new CyclicBarrier(threadCount + 1), 
@@ -46,10 +47,26 @@ class TestStmHistogram {
               }
             });
         threads[t].start();
+        //Ex 10.2.6
+        try{
+          Thread.sleep(30);
+        }
+        catch (Exception e) {
+          //should do something
+        }
+        total.transferBins(histogram);
+
     }
     try { startBarrier.await(); } catch (Exception exn) { }
     try { stopBarrier.await(); } catch (Exception exn) { }
     dump(histogram);
+    dump(total);
+
+    //Ex 10.2.7
+    System.out.println("EX 10.2.7");
+    total.transferBins(total);
+    dump(total);
+
   }
 
   public static void dump(Histogram histogram) {
@@ -89,31 +106,57 @@ class StmHistogram implements Histogram {
   private final TxnInteger[] counts;
 
   public StmHistogram(int span) {
-    throw new RuntimeException("Not implemented");
+    this.counts = new TxnInteger[span];
+    for(int i = 0; i<counts.length; i++){
+      //instanciating the values in counts
+      counts[i] = newTxnInteger();
+    }
   }
-
+  //Ex 10.2.1 
   public void increment(int bin) {
-    throw new RuntimeException("Not implemented");
+    atomic(new Runnable() { public void run(){
+      counts[bin].increment();
+    }});
   }
 
+  //Ex 10.2.1
   public int getCount(int bin) {
-    throw new RuntimeException("Not implemented");
+    return atomic(new Callable<Integer>() {public Integer call(){
+      return counts[bin].get();
+    }});
   }
 
+  //Ex 10.2.1
   public int getSpan() {
-    throw new RuntimeException("Not implemented");
+      return counts.length;
   }
 
+  //10.2.3
   public int[] getBins() {
-    throw new RuntimeException("Not implemented");
+    int[] ar = new int[getSpan()];
+    for(int i = 0; i < ar.length; i++){
+      ar[i] = getCount(i);
+    }
+    return ar;
   }
 
+  //10.2.4
   public int getAndClear(int bin) {
-    throw new RuntimeException("Not implemented");
+    return atomic(new Callable<Integer>() {public Integer call(){
+      int res = counts[bin].get();
+      counts[bin].set(0);
+      return res;
+    }});
   }
 
+  //10.2.5
   public void transferBins(Histogram hist) {
-    throw new RuntimeException("Not implemented");
+    for(int i = 0 ; i<hist.getSpan(); i++){
+      final int j = i;
+      atomic(new Runnable() {public void run(){
+        counts[j].set(hist.getAndClear(j));
+      }});
+    }
   }
 }
 

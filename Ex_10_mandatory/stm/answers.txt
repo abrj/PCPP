@@ -1,0 +1,21 @@
+#### 10.2 ####
+10.2.1 See TestStmHistogram.java
+
+10.2.2 See TestStmHistogram.java
+Yes the produced result is correct
+
+10.2.3 See TestStmHistogram.java
+
+10.2.4 See TestStmHistogram.java
+
+10.2.5 See TestStmHistogram.java
+
+10.2.6 See TestStmHistogram.java.
+The result is corrected, since is produced the same list as is 10.2.2 for total and the old histogram is empty
+
+10.2.7 
+We expect the end result of total to be empty. The method starts by reading and set the value, and then it uses getAndClear() to clear the values, which leads to a produced result of 0.
+
+ 
+
+
