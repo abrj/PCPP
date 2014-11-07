@@ -17,6 +17,16 @@ The result is corrected, since is produced the same list as is 10.2.2 for total 
 We expect the end result of total to be empty. The method starts by reading and set the value, and then it uses getAndClear() to clear the values, which leads to a produced result of 0.
 
 ### 10.3 ###
+NB: The file TestStmMap.java does not compile. The reason is the external files provided as coursematerials. We dont know how to fix this and was unable to reach the TA's
+
+10.3.1 See TestStmMap.java
+
+10.3.2 See TestStmMap.java
+
+10.3.3 See TestStmMap.java
+
+10.3.4 See TestStmMap.java
+
 10.3.5 
 It would seem that the idea about having a flag to determine if a reallocation is in progress would work, and prevent the other threads from commiting.
 This would however mean that every transaction will have to check for the flag.

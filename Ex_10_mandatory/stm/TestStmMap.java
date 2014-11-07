@@ -242,10 +242,12 @@ class StmMap<K,V> implements OurMap<K,V> {
     }});
   }
 
+  //Ex 10.3.4
   public int size() {
     return size.get();
   }
 
+  //Ex 10.3.3
   // Put v at key k, or update if already present.  
   public V put(K k, V v) {
     final int h = getHash(k), hash = h % buckets.get().length;
@@ -263,6 +265,7 @@ class StmMap<K,V> implements OurMap<K,V> {
     }});
   }
 
+  //Ex 10.3.3
   // Put v at key k only if absent.  
   public V putIfAbsent(K k, V v) {
     final int h = getHash(k), hash = h % buckets.get().length;
@@ -278,7 +281,7 @@ class StmMap<K,V> implements OurMap<K,V> {
       }});
     }
 
-
+  //Ex 10.3.3
   // Remove and return the value at key k if any, else return null
   public V remove(K k) {
     final int h = getHash(k), hash = h % buckets.get().length;
