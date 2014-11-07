@@ -12,7 +12,12 @@ import org.multiverse.api.references.*;
 import org.multiverse.api.StmUtils;
 import org.multiverse.api.callables.TxnVoidCallable;
 import static org.multiverse.api.StmUtils.*;
+import java.util.Random;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerArray;
+import java.util.*;
 import java.util.Random;
 
 import java.util.concurrent.Callable;
@@ -222,9 +227,18 @@ class StmMap<K,V> implements OurMap<K,V> {
     }});
   }
 
+  //Ex 10.3.1
   // Return value v associated with key k, or null
   public V get(K k) {
-    throw new RuntimeException("Not implemented");
+    return atomic(new Callable<V>() {public V call(){
+      final int h = getHash(k), hash = h % buckets.get().length;
+      TxnInteger ti = newTxnInteger(hash);
+      ItemNode<K,V> node = ItemNode.search2(buckets.get()[hash].get(), k);
+      if (node != null) 
+        return node.v;
+      else
+        return null;
+    }});
   }
 
   public int size() {
@@ -246,13 +260,25 @@ class StmMap<K,V> implements OurMap<K,V> {
     throw new RuntimeException("Not implemented");
   }
 
+  //Ex 10.3.2
   // Iterate over the hashmap's entries one bucket at a time.  Since a
   // reallocate does not affect the old buckets table, and item node
   // lists are immutable, only visibility is needed, no transactions.
   // This is good, because calling a consumer inside an atomic seems
   // suspicious.
   public void forEach(Consumer<K,V> consumer) {
-    throw new RuntimeException("Not implemented");
+    for(int i = 0; i<buckets.get().length; i++){
+      final int j = i;
+      ItemNode<K,V> itemNode = atomic(new Callable<ItemNode<K,V>>(){public ItemNode<K,V> call(){
+        return buckets.get()[j].get(); 
+      }});
+      while(itemNode != null){
+        consumer.accept(itemNode.k, itemNode.v);
+        itemNode = itemNode.next;
+      }
+
+    }
+
   }
 
   // public void reallocateBuckets() { 
@@ -269,6 +295,12 @@ class StmMap<K,V> implements OurMap<K,V> {
       this.v = v;
       this.next = next;
     }
+    public static <K,V> ItemNode<K,V> search2(ItemNode<K,V> node, K k) {
+      while (node != null && !k.equals(node.k))
+      node = node.next;
+      return node;
+    }
+
 
     // These work on immutable data only, no synchronization or transaction needed.
 
