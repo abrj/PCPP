@@ -520,12 +520,12 @@ class StripedMap<K,V> implements OurMap<K,V> {
     }
   }
 
-  //Ex 7.1.5
+  //Ex 7.1.5 - RESUBMITTED
   // Iterate over the hashmap's entries one stripe at a time; less locking
   public void forEach(Consumer<K,V> consumer) {      
     for(int i = 0; i<lockCount; i++){
       synchronized(locks[i]){
-        for(int j = i; j < buckets.length; j++){
+        for(int j = i; j < buckets.length; j+=lockCount){
           ItemNode<K,V> itemNode = buckets[j];
           while(itemNode != null){
             consumer.accept(itemNode.k, itemNode.v);
@@ -704,7 +704,7 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
     }
   }
 
-  //Ex 7.2.3
+  //Ex 7.2.3 - RESUBMITTED
   // Remove and return the value at key k if any, else return null
   public V remove(K k) {
     final ItemNode<K,V>[] bs = buckets;
@@ -724,17 +724,20 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
     }
   }
 
-  //Ex 7.2.4
+  //Ex 7.2.4 - Resubmitted
   // Iterate over the hashmap's entries one stripe at a time.  
   public void forEach(Consumer<K,V> consumer) {
     final ItemNode<K,V>[] bs = buckets;
     for(int i = 0; i<lockCount; i++){
       final int s = bs.length;
-      for(int j=0; j<s; j++){
-        ItemNode<K,V> itemNode = bs[j];
-        while(itemNode != null){
-          consumer.accept(itemNode.k, itemNode.v);
-          itemNode = itemNode.next;
+      for(int j=i; j<s; j+=lockCount){
+        int stripe = j % lockCount;
+        if(sizes.get(stripe)!= 0){
+          ItemNode<K,V> itemNode = bs[j];
+          while(itemNode != null){
+            consumer.accept(itemNode.k, itemNode.v);
+            itemNode = itemNode.next;
+          }
         }
       }
     }    
