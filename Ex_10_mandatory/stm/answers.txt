@@ -16,6 +16,15 @@ The result is corrected, since is produced the same list as is 10.2.2 for total 
 10.2.7 
 We expect the end result of total to be empty. The method starts by reading and set the value, and then it uses getAndClear() to clear the values, which leads to a produced result of 0.
 
- 
+### 10.3 ###
+10.3.5 
+It would seem that the idea about having a flag to determine if a reallocation is in progress would work, and prevent the other threads from commiting.
+This would however mean that every transaction will have to check for the flag.
+In addition to the above it does not seem to solve the problem about multiple threads calling reallocate, as this method does not check for the flag.
+
+
+A transaction can either restart or retry. Restart is called when a method could not commit the transaction and retry is called when you want to block and wait for another transaction or variable to change.
+Thus it would make sense to have the transactions keep re-trying as long as the newBuckets field is not null. 
+
 
 
