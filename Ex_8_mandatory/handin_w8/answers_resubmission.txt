@@ -1,0 +1,20 @@
+#### 8.1 ####
+7.1.3 
+We have moved the computation of the hash into the syncronized block in the putIfAbsent().
+
+7.1.2 
+It is important to lock the sizes array when reading because
+sizes is updated in the put method. If you were to lock on the wrong stripe, another thread could update the content of the bucket, which the size is computed from, given a wrong end result.
+
+7.1.5
+We noticed that we set j = i, and therefore changed j = 0, which we believe to solve the problems of the performance.
+
+#### 8.2 ####
+7.2.2 
+We have moved the synchronized block, so that the search is perfomed when synchronized
+
+7.2.3 
+We forgot to synchronize in the method. We have included this now
+
+#### 8.3 ####
+We wanted to make sure that the progressbar were only incremented, and not decremented, which could be a case if t7 would finish before t1. 
