@@ -6,10 +6,18 @@
 
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
+import java.util.Random;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class TestMSQueue extends TestMS{
   public static void main(String[] args) {
     LockingQueue lq = new LockingQueue();
     LockingQueue.sequentialTest(lq);
+    LockingQueue.parallelTest(lq);
   }
 }
 
@@ -20,21 +28,93 @@ interface UnboundedQueue<T> {
 }
 
  class TestMS {
-  public static void assertEquals(int x, int y) throws Exception {
+  public static void assertEquals(int x, int y) throws RuntimeException {
     if (x != y) 
-      throw new Exception(String.format("ERROR: %d not equal to %d%n", x, y));
+      throw new RuntimeException(String.format("ERROR: %d not equal to %d%n", x, y));
   }
 
-  public static void assertTrue(boolean b) throws Exception {
+  public static void assertTrue(boolean b) throws RuntimeException {
     if (!b) 
-      throw new Exception(String.format("ERROR: assertTrue"));
+      throw new RuntimeException(String.format("ERROR: assertTrue"));
+  }
+}
+
+class PutTakeTest extends TestMS {
+  protected CyclicBarrier barrier;
+  protected final LockingQueue<Integer> lq;
+  protected final int nTrials, nPairs;
+  protected final AtomicInteger putSum = new AtomicInteger(0);
+  protected final AtomicInteger takeSum = new AtomicInteger(0);
+
+  public PutTakeTest(LockingQueue<Integer> lq, int npairs, int ntrials) {
+    this.lq = lq;
+    this.nTrials = ntrials;
+    this.nPairs = npairs;
+    this.barrier = new CyclicBarrier(npairs * 2 + 1);
+  }
+  
+  void test(ExecutorService pool) {
+    try {
+      for (int i = 0; i < nPairs; i++) {
+        pool.execute(new Producer());
+        pool.execute(new Consumer());
+      }      
+      barrier.await(); // wait for all threads to be ready
+      barrier.await(); // wait for all threads to finish      
+      assertTrue(lq.isEmpty());
+      assertEquals(putSum.get(), takeSum.get());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  class Producer implements Runnable {
+    public void run() {
+      try {
+        Random random = new Random();
+        int sum = 0;
+        barrier.await();
+        for (int i = nTrials; i > 0; --i) {
+          int item = random.nextInt();
+          lq.enqueue(item);
+          sum += item;
+        }
+        putSum.getAndAdd(sum);
+        barrier.await();
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+  
+  class Consumer implements Runnable {
+    public void run() {
+      try {
+        barrier.await();
+        int sum = 0;
+        int elements = 0;
+        while(true){
+          Integer n = lq.dequeue();
+          if(n != null){
+            elements++;
+            sum += n;
+          }
+          if(elements == nTrials)
+            break;
+        }
+        takeSum.getAndAdd(sum);
+        barrier.await();
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
 }
 
 // ------------------------------------------------------------
 // Unbounded lock-based queue with sentinel (dummy) node
 
-class LockingQueue<T> implements UnboundedQueue<T> {  
+class LockingQueue<T> extends TestMS implements UnboundedQueue<T> {  
   // Invariants:
   // The node referred by tail is reachable from head.
   // If non-empty then head != tail, 
@@ -73,7 +153,7 @@ class LockingQueue<T> implements UnboundedQueue<T> {
   public static void sequentialTest(LockingQueue<Integer> lq) throws RuntimeException {
     System.out.printf("%nSequential test: %s", lq.getClass());    
     assertTrue(lq.isEmpty());
-    bq.enqueue(7); lq.enqueue(9); lq.enqueue(13); 
+    lq.enqueue(7); lq.enqueue(9); lq.enqueue(13); 
     assertTrue(!lq.isEmpty());
     assertEquals(lq.dequeue(), 7);
     assertEquals(lq.dequeue(), 9);
@@ -82,7 +162,15 @@ class LockingQueue<T> implements UnboundedQueue<T> {
     System.out.println("... passed");
   }
 
-  private boolean isEmpty(){
+  public static void parallelTest(LockingQueue<Integer> bq) throws RuntimeException {
+    System.out.printf("%nParallel test: %s", bq.getClass()); 
+    final ExecutorService pool = Executors.newCachedThreadPool();
+    new PutTakeTest(bq, 17, 100000).test(pool); 
+    pool.shutdown();
+    System.out.println("... passed");      
+  }
+
+  public boolean isEmpty(){
     if(head == tail){
       return true;
     }
