@@ -6,9 +6,10 @@
 
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
-
-public class TestMSQueue {
+public class TestMSQueue extends TestMS{
   public static void main(String[] args) {
+    LockingQueue lq = new LockingQueue();
+    LockingQueue.sequentialTest(lq);
   }
 }
 
@@ -16,6 +17,18 @@ public class TestMSQueue {
 interface UnboundedQueue<T> {
   void enqueue(T item);
   T dequeue();
+}
+
+ class TestMS {
+  public static void assertEquals(int x, int y) throws Exception {
+    if (x != y) 
+      throw new Exception(String.format("ERROR: %d not equal to %d%n", x, y));
+  }
+
+  public static void assertTrue(boolean b) throws Exception {
+    if (!b) 
+      throw new Exception(String.format("ERROR: assertTrue"));
+  }
 }
 
 // ------------------------------------------------------------
@@ -56,6 +69,24 @@ class LockingQueue<T> implements UnboundedQueue<T> {
     Node<T> first = head;
     head = first.next;
     return head.item;
+  }
+  public static void sequentialTest(LockingQueue<Integer> lq) throws RuntimeException {
+    System.out.printf("%nSequential test: %s", lq.getClass());    
+    assertTrue(lq.isEmpty());
+    bq.enqueue(7); lq.enqueue(9); lq.enqueue(13); 
+    assertTrue(!lq.isEmpty());
+    assertEquals(lq.dequeue(), 7);
+    assertEquals(lq.dequeue(), 9);
+    assertEquals(lq.dequeue(), 13);
+    assertTrue(lq.isEmpty());
+    System.out.println("... passed");
+  }
+
+  private boolean isEmpty(){
+    if(head == tail){
+      return true;
+    }
+    return false;
   }
 }
 
