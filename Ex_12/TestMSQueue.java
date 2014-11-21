@@ -150,6 +150,7 @@ class LockingQueue<T> extends TestMS implements UnboundedQueue<T> {
     head = first.next;
     return head.item;
   }
+  // 12.1.1
   public static void sequentialTest(LockingQueue<Integer> lq) throws RuntimeException {
     System.out.printf("%nSequential test: %s", lq.getClass());    
     assertTrue(lq.isEmpty());
@@ -162,6 +163,7 @@ class LockingQueue<T> extends TestMS implements UnboundedQueue<T> {
     System.out.println("... passed");
   }
 
+  //12.1.2
   public static void parallelTest(LockingQueue<Integer> bq) throws RuntimeException {
     System.out.printf("%nParallel test: %s", bq.getClass()); 
     final ExecutorService pool = Executors.newCachedThreadPool();
