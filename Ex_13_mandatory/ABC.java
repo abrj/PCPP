@@ -37,7 +37,12 @@ class DepositMessage implements Serializable{
     }
 }
 
+
 class PrintBalanceMessage implements Serializable{
+    public final String name;
+    public PrintBalanceMessage(String name){
+        this.name = name;
+    }
 
 }
 
@@ -45,13 +50,15 @@ class PrintBalanceMessage implements Serializable{
 
 class AccountActor extends UntypedActor {
     private int balance = 0;
+
     public void onReceive(Object o) throws Exception {
         if(o instanceof DepositMessage){
             DepositMessage depositMsg = (DepositMessage) o;
             this.balance += depositMsg.value;
         }
         if(o instanceof PrintBalanceMessage){
-            System.out.println("Balance: " + this.balance);
+            PrintBalanceMessage printMsg = (PrintBalanceMessage) o;
+            System.out.println("Account: " + printMsg.name + ". Balance: " + this.balance);
         }
     }
 }
@@ -109,10 +116,10 @@ public class ABC {
     		System.in.read();
 
     		//INSPECT FINAL BALANCES
-            a1.tell(new PrintBalanceMessage(), ActorRef.noSender());
-            a2.tell(new PrintBalanceMessage(), ActorRef.noSender());
+            a1.tell(new PrintBalanceMessage("account1"), ActorRef.noSender());
+            a2.tell(new PrintBalanceMessage("account2"), ActorRef.noSender());
 
-            
+
             Thread.sleep(100);
     		System.out.println("Press return to terminate...");
     		System.in.read();
