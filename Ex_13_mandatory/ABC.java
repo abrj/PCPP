@@ -5,13 +5,14 @@
 
 import java.io.*;
 import akka.actor.*;
+import java.util.*;
 
 // -- MESSAGES --------------------------------------------------
 
 class StartTransferMessage implements Serializable {
     public final ActorRef from, to, bank;
     public final int count;
-    public StartTransferMessage( ActorRef bank, ActorRef from, ActorRef to, int count){
+    public StartTransferMessage(ActorRef bank, ActorRef from, ActorRef to, int count){
         this.bank = bank;
         this.from = from;
         this.to = to;
@@ -46,7 +47,8 @@ class AccountActor extends UntypedActor {
     private int balance = 0;
     public void onReceive(Object o) throws Exception {
         if(o instanceof DepositMessage){
-            this.balance += (DepositMessage) o.value;
+            DepositMessage depositMsg = (DepositMessage) o;
+            this.balance += depositMsg.value;
         }
         if(o instanceof PrintBalanceMessage){
             System.out.println("Balance: " + this.balance);
@@ -95,23 +97,30 @@ public class ABC {
         final ActorRef c2 = system.actorOf(Props.create(ClerkActor.class), "Clerk2");
 
         //SEND STARTMESSAGE
-        c1.tell(new StartTransferMessage(b1, a1, a2), ActorRef.noSender());
-        c2.tell(new StartTransferMessage(b2, a2, a1));
+        c1.tell(new StartTransferMessage(b1, a1, a2, 100), ActorRef.noSender());
+        c2.tell(new StartTransferMessage(b2, a2, a1, 100), ActorRef.noSender());
 
 
 
 
     	try{
+            Thread.sleep(100);
     		System.out.println("Press return to inspect...");
     		System.in.read();
 
     		//INSPECT FINAL BALANCES
+            a1.tell(new PrintBalanceMessage(), ActorRef.noSender());
+            a2.tell(new PrintBalanceMessage(), ActorRef.noSender());
 
+            
+            Thread.sleep(100);
     		System.out.println("Press return to terminate...");
     		System.in.read();
-    	} cath(IOException e){
+    	}
+        catch(Exception e){
     		e.printStackTrace();
-    	} finally{
+    	} 
+        finally{
     		system.shutdown();
     	}
     }
