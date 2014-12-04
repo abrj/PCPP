@@ -1,0 +1,7 @@
+#### 13 ####
+A) See Colored.ABC.erl.pdf
+
+B) See ABC.java
+
+C) If the described situation were to take place, the system could lead to 'lost-update' errors. This could happen in a situation were B1 inspects A1 and get 42(balance) back, then B2 inspects A1 and get 42(balance) back. B1 needs to update the balance with 6, resulting in balance = 48. Then B2 wants to update with 4 and therefore setting the final balance=46. Thereby missing the update of 6 from B1.
+
