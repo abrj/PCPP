@@ -9,20 +9,31 @@ import akka.actor.*;
 // -- MESSAGES --------------------------------------------------
 
 class StartTransferMessage implements Serializable {
-    ActorRef thisAccount, thatAccount, bank;
-    public StartTransferMessage( ActorRef bank, ActorRef a1, ActorRef a2){
+    public final ActorRef from, to, bank;
+    public final int count;
+    public StartTransferMessage( ActorRef bank, ActorRef from, ActorRef to, int count){
         this.bank = bank;
-        thisAccount = a1;
-        thatAccount = a2;
+        this.from = from;
+        this.to = to;
+        this.count = count;
     }
 }
 
 class TransferMessage implements Serializable {
-
+    public final ActorRef from, to;
+    public final int amount;
+    public TransferMessage(int amount, ActorRef from, ActorRef to){
+        this.amount = amount;
+        this.from = from;
+        this.to = to;
+    }
 }
 
 class DepositMessage implements Serializable{
-
+    public final int value;
+    public DepositMessage (int value){
+        this.value = value;
+    }
 }
 
 class PrintBalanceMessage implements Serializable{
@@ -32,12 +43,13 @@ class PrintBalanceMessage implements Serializable{
 // -- ACTORS --------------------------------------------------
 
 class AccountActor extends UntypedActor {
+    private int balance = 0;
     public void onReceive(Object o) throws Exception {
         if(o instanceof DepositMessage){
-
+            this.balance += (DepositMessage) o.value;
         }
         if(o instanceof PrintBalanceMessage){
-
+            System.out.println("Balance: " + this.balance);
         }
     }
 }
@@ -45,7 +57,9 @@ class AccountActor extends UntypedActor {
 class BankActor extends UntypedActor {
     public void onReceive(Object o) throws Exception{
         if(o instanceof TransferMessage){
-
+            TransferMessage tm = (TransferMessage) o;
+            tm.from.tell(new DepositMessage(-tm.amount), ActorRef.noSender());
+            tm.to.tell(new DepositMessage(tm.amount), ActorRef.noSender());
         }
     }
 }
@@ -54,9 +68,10 @@ class ClerkActor extends UntypedActor{
     public void onReceive(Object o) throws Exception{
         if(o instanceof StartTransferMessage){
             StartTransferMessage startMsg = (StartTransferMessage) o;
-            for(int i = 100; i>100;i--){
-
-                startMsg.bank.tell(new TransferMessage(), ActorRef.noSender());
+            Random rnd = new Random();
+            for(int i = 0; i < startMsg.count; i++){
+                int amount = rnd.nextInt(100);
+                startMsg.bank.tell(new TransferMessage(amount, startMsg.from, startMsg.to), ActorRef.noSender());
 
             }
          }
