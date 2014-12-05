@@ -12,16 +12,16 @@ import java.util.function.Function;
 
 public class TestCache {
   public static void main(String[] args) throws InterruptedException {
-    Computable<Long, long[]> factorizer = new Factorizer(),
-      cachingFactorizer = new Memoizer5<Long,long[]>(factorizer);
-    // cachingFactorizer = factorizer;
+    // Computable<Long, long[]> factorizer = new Factorizer(),
+    //   cachingFactorizer = new Memoizer5<Long,long[]>(factorizer);
+    // // cachingFactorizer = factorizer;
     
-    long p = 71827636563813227L;
+    // long p = 71827636563813227L;
 
-    print(factorizer.compute(p));
+    // print(factorizer.compute(p));
 
-    long[] factors = cachingFactorizer.compute(p);
-    print(factors);
+    // long[] factors = cachingFactorizer.compute(p);
+    // print(factors);
 
     // print(cachingFactorizer.compute(p));
     // print(cachingFactorizer.compute(p));
@@ -30,11 +30,64 @@ public class TestCache {
     // print(cachingFactorizer.compute(p));
     // print(cachingFactorizer.compute(p));
     // print(cachingFactorizer.compute(p));
-    //Test
-    Factorizer f = new Factorizer();
-    exerciseFactorizer(new Memoizer1<Long, long[]>(f));
-    System.out.println(f.getCount());
-    // exerciseFactorizer(cachingFactorizer);
+    //Assignment 3.2
+        Timer t = new Timer();
+        Factorizer f = new Factorizer();
+        exerciseFactorizer(new Memoizer1<Long, long[]>(f)); 
+        System.out.println( f.getCount() + " with time " + t.check());
+
+        System.out.println("####");
+        t = new Timer();
+         f = new Factorizer();
+        exerciseFactorizer(new Memoizer2<Long, long[]>(f)); 
+        System.out.println( f.getCount() + " with time " + t.check());
+        
+        System.out.println("####");
+        t = new Timer();
+         f = new Factorizer();
+        exerciseFactorizer(new Memoizer3<Long, long[]>(f)); 
+        System.out.println( f.getCount() + " with time " + t.check());
+
+        System.out.println("####");
+        t = new Timer();
+         f = new Factorizer();
+        exerciseFactorizer(new Memoizer4<Long, long[]>(f)); 
+        System.out.println( f.getCount() + " with time " + t.check());
+        //TEST
+    // Mark.Mark7("Factorizer with Memo1", new IntToDouble() {
+    //   public double call(int i) { 
+    //     Factorizer f = new Factorizer();
+    //     exerciseFactorizer(new Memoizer1<Long, long[]>(f)); 
+    //     return f.getCount();
+    //   } });
+    // System.out.println("#########");
+    // Mark.Mark7("Factorizer with Memo2", new IntToDouble() {
+    //   public double call(int i) { 
+    //     Factorizer f = new Factorizer();
+    //     exerciseFactorizer(new Memoizer2<Long, long[]>(f)); 
+    //     return f.getCount();
+    //   } });
+    // System.out.println("#########");
+    // Mark.Mark7("Factorizer with Memo3", new IntToDouble() {
+    //   public double call(int i) { 
+    //     Factorizer f = new Factorizer();
+    //     exerciseFactorizer(new Memoizer3<Long, long[]>(f)); 
+    //     return f.getCount();
+    //   } });          
+    // System.out.println("#########");
+    // Mark.Mark7("Factorizer with Memo4", new IntToDouble() {
+    //   public double call(int i) { 
+    //     Factorizer f = new Factorizer();
+    //     exerciseFactorizer(new Memoizer4<Long, long[]>(f)); 
+    //     return f.getCount();
+    //   } });
+    // System.out.println("#########");
+    // Mark.Mark7("Factorizer with Memo5", new IntToDouble() {
+    //   public double call(int i) { 
+    //     Factorizer f = new Factorizer();
+    //     exerciseFactorizer(new Memoizer5<Long, long[]>(f)); 
+    //     return f.getCount();
+    //   } });    
   }
 
 
@@ -47,8 +100,7 @@ public class TestCache {
   private static void exerciseFactorizer(Computable<Long, long[]> f){
     final int threadCount = 16;
     final long start = 10000000000L, range = 20000L;
-    final long start2= 10000020000L;
-    System.out.println(f);
+    // System.out.println(f.getClass());
     Thread[] threads = new Thread[threadCount];
 
     for(int i =0; i<threadCount; i++){
@@ -59,14 +111,14 @@ public class TestCache {
       threads[i] = new Thread(new Runnable(){
         public void run(){
           try{
-            System.out.println("running from " + from + " to " + to + " and from " + from2 + " to " + to2 + " with ");
+            // System.out.println("running from " + from + " to " + to + " and from " + from2 + " to " + to2 + " with ");
             long tmp1 = to-from;
             long tmp2 = to2-from2;
-            System.out.println("from - to = " + tmp1 + " and from2 - to2 = " + tmp2);
+            // System.out.println("from - to = " + tmp1 + " and from2 - to2 = " + tmp2);
             for(long j=from; j<to; j++){ f.compute(j);  }
             for(long l=from2; l<to2; l++){ f.compute(l); }        
             }
-          catch(InterruptedException i){ System.out.println("fuck"); }
+          catch(InterruptedException i){ System.out.println("Something went wrong.."); }
           }
       });
     }
@@ -79,7 +131,7 @@ public class TestCache {
         threads[t].join(); 
       }
       catch(InterruptedException i){
-        System.out.println("Fuck 2 ");
+        System.out.println("Something went wrong..");
       }
     }
   }
