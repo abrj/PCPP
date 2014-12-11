@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
+import java.util.concurrent.*;
+import java.util.*;
 
 public class TestPipeline {
   public static void main(String[] args) {
@@ -34,16 +36,37 @@ public class TestPipeline {
   private static void runAsThreads() {
     final BlockingQueue<String> urls = new OneItemQueue<String>();
     final BlockingQueue<Webpage> pages = new OneItemQueue<Webpage>();
-    final BlockingQueue<Link> refPairs = new OneItemQueue<Link>();
-    Thread t1 = new Thread(new UrlProducer(urls));
-    Thread t2 = new Thread(new PageGetter(urls, pages));
-    Thread t3 = new Thread(new LinkScanner(pages, refPairs));
-    Thread t4 = new Thread(new LinkPrinter(refPairs));
-    t1.start(); t2.start(); t3.start(); t4.start(); 
+    // final BlockingQueue<Link> refPairs = new OneItemQueue<Link>(); NOT USED
+    final BlockingQueue<Link> links = new OneItemQueue<Link>();
+    final BlockingQueue<Link> uniqueLinks = new OneItemQueue<Link>();
+
+
+    // Thread t1 = new Thread(new UrlProducer(urls));
+    // Thread t2 = new Thread(new PageGetter(urls, pages));
+    // Thread t3 = new Thread(new LinkScanner(pages, links));
+    // Thread t4 = new Thread(new Uniquifier<Link>(links, uniqueLinks));
+    // Thread t5 = new Thread(new LinkPrinter(uniqueLinks));
+    // // t1.start(); t2.start(); t3.start(); t4.start(); t5.start();
+    //Ex 5.4.3 
+    ExecutorService executor = Executors.newFixedThreadPool(6);
+    List<Callable<Void>> tasks = new ArrayList<Callable<Void>>();
+    tasks.add(new UrlProducer(urls));
+    tasks.add(new PageGetter(urls, pages));
+    tasks.add(new PageGetter(urls, pages)); //Ex 5.4.6
+    tasks.add(new LinkScanner(pages, links));
+    tasks.add(new Uniquifier<Link>(links, uniqueLinks));
+    tasks.add(new LinkPrinter(uniqueLinks));
+
+    try{
+      List<Future<Void>> futures = executor.invokeAll(tasks);
+    }
+    catch(Exception e){
+      System.out.println("this went wrong");
+    }
   }
 }
 
-class UrlProducer implements Runnable {
+class UrlProducer implements Runnable, Callable<Void> {
   private final BlockingQueue<String> output;
 
   public UrlProducer(BlockingQueue<String> output) {
@@ -54,6 +77,13 @@ class UrlProducer implements Runnable {
     for (int i=0; i<urls.length; i++)
       output.put(urls[i]);
   }
+  //Must be implemented in order to use the class as a Callable
+  public Void call(){
+    System.out.println("Url producer..");
+    for (int i=0; i<urls.length; i++)
+      output.put(urls[i]);
+    return null;
+  }
 
   private static final String[] urls = 
   { "http://www.itu.dk", "http://www.di.ku.dk", "http://www.miele.de",
@@ -63,7 +93,7 @@ class UrlProducer implements Runnable {
   };
 }
 
-class PageGetter implements Runnable {
+class PageGetter implements Runnable, Callable<Void> {
   private final BlockingQueue<String> input;
   private final BlockingQueue<Webpage> output;
 
@@ -98,9 +128,21 @@ class PageGetter implements Runnable {
       return sb.toString();
     }
   }
+    //Must be implemented in order to use the class as a Callable
+  public Void call(){
+    System.out.println("pagegetter...");
+    while (true) {
+      String url = input.take();
+      //      System.out.println("PageGetter: " + url);
+      try { 
+        String contents = getPage(url, 200);
+        output.put(new Webpage(url, contents));
+      } catch (IOException exn) { System.out.println(exn); }
+    }
+  }
 }
 
-class LinkScanner implements Runnable {
+class LinkScanner implements Runnable, Callable<Void> {
   private final BlockingQueue<Webpage> input;
   private final BlockingQueue<Link> output;
 
@@ -125,9 +167,23 @@ class LinkScanner implements Runnable {
       }
     }
   }
+    //Must be implemented in order to use the class as a Callable
+  public Void call(){
+    System.out.println("LinkScanner...");
+    while (true) {
+      Webpage page = input.take();
+      //      System.out.println("LinkScanner: " + page.url);
+      // Extract links from the page's <a href="..."> anchors
+      Matcher urlMatcher = urlPattern.matcher(page.contents);
+      while (urlMatcher.find()) {
+        String link = urlMatcher.group(1);
+        output.put(new Link(page.url, link));
+      }
+    }
+  }
 }
 
-class LinkPrinter implements Runnable {
+class LinkPrinter implements Runnable, Callable<Void> {
   private final BlockingQueue<Link> input;
 
   public LinkPrinter(BlockingQueue<Link> input) {
@@ -135,6 +191,15 @@ class LinkPrinter implements Runnable {
   }
 
   public void run() { 
+    while (true) {
+      Link link = input.take();
+      //      System.out.println("LinkPrinter: " + link.from);
+      System.out.printf("%s links to %s%n", link.from, link.to);
+    }
+  }
+  //Must be implemented in order to use the class as a Callable
+  public Void call(){
+    System.out.println("linkPrinter...");
     while (true) {
       Link link = input.take();
       //      System.out.println("LinkPrinter: " + link.from);
@@ -207,6 +272,44 @@ class OneItemQueue<T> implements BlockingQueue<T> {
       full = false;
       this.notifyAll();
       return item;
+    }
+  }
+}
+//Ex 5.4.2
+class Uniquifier<T> implements Runnable, Callable<Void> {
+  private final BlockingQueue<T> input;
+  private final BlockingQueue<T> output;
+  private final HashSet<T> uniqueItems = new HashSet<T>();
+
+  public Uniquifier(BlockingQueue<T> input, BlockingQueue<T> output) {
+    this.input = input;
+    this.output = output;
+  }
+
+  public void run() { 
+    while(true){
+      T link = input.take();
+      if(!uniqueItems.contains(link)){
+        uniqueItems.add(link);
+        output.put(link);
+      }
+      else{
+        System.out.println("found already used link: ");
+      }
+    }
+  }
+    //Must be implemented in order to use the class as a Callable
+  public Void call(){
+    System.out.println("Uniquifier...");
+    while(true){
+      T link = input.take();
+      if(!uniqueItems.contains(link)){
+        uniqueItems.add(link);
+        output.put(link);
+      }
+      else{
+        System.out.println("found already used link: ");
+      }
     }
   }
 }

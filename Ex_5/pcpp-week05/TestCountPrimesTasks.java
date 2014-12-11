@@ -19,8 +19,8 @@ import java.util.concurrent.Future;
 
 public class TestCountPrimesTasks {
   private static final ExecutorService executor 
-    // = Executors.newWorkStealingPool();
-   = Executors.newCachedThreadPool();
+     = Executors.newWorkStealingPool();
+   // = Executors.newCachedThreadPool();
   
   public static void main(String[] args) {
     SystemInfo();

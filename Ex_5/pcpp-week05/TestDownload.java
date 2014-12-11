@@ -28,14 +28,17 @@ public class TestDownload {
   };
 
   public static void main(String[] args) throws IOException {
-    String url = "http://www.wikipedia.org/";
+    // String url = "http://www.wikipedia.org/";
     // String page = getPage(url, 10);
     // System.out.printf("%-30s%n%s%n", url, page);
-    //Ex 5.3
+    //Ex 5.3.1
 
-  //   for(Map.Entry<String, String> ent : getPages(urls, 10).entrySet()){
-  //     System.out.println("for " + ent.getKey() + "\n ### " + ent.getValue());
-  //   }
+    Timer t = new Timer();
+    Map<String, String> map = getPagesParallel(urls, 100);
+    System.out.println("timer spent :" + t.check());
+    for(Map.Entry<String, String> ent : map.entrySet()){
+      // System.out.println("for " + ent.getKey() + "\n ### " + ent.getValue());
+    }
   }
 
   public static String getPage(String url, int maxLines) throws IOException {
@@ -53,7 +56,7 @@ public class TestDownload {
       return sb.toString();
     }
   }
-
+  //Ex 5.3.2
   //Returns a unmodifiableMap
   public static Map<String, String> getPages(String[] urls, int maxLines){
     HashMap<String, String> tmpMap = new HashMap<>();
@@ -68,7 +71,7 @@ public class TestDownload {
     }
     return Collections.unmodifiableMap(tmpMap);
   }
-
+  //Ex 5.3.4
   public static Map<String, String> getPagesParallel(String[] urls, int maxLines){
     HashMap<String, String> tmpMap = new HashMap<>();
     List<Future<String>> futures = new ArrayList<Future<String>>();
