@@ -19,8 +19,8 @@ import java.util.concurrent.Future;
 
 public class TestCountPrimesTasks {
   private static final ExecutorService executor 
-    = Executors.newWorkStealingPool();
-  //  = Executors.newCachedThreadPool();
+    // = Executors.newWorkStealingPool();
+   = Executors.newCachedThreadPool();
   
   public static void main(String[] args) {
     SystemInfo();
@@ -44,22 +44,22 @@ public class TestCountPrimesTasks {
             public double call(int i) { 
               return countParallelN3(range, 32);
             }}));
-    // for (int c=1; c<=100; c++) {
-    //   final int taskCount = c;
-    //   Mark7(String.format("countParTask1 %6d", taskCount), 
-    //     new IntToDouble() {
-    //       public double call(int i) { 
-    //         return countParallelN1(range, taskCount);
-    //       }});
-    // }
-    // for (int c=1; c<=100; c++) {
-    //   final int taskCount = c;
-    //   Mark7(String.format("countParTask2 %6d", taskCount), 
-    //     new IntToDouble() {
-    //       public double call(int i) { 
-    //         return countParallelN2(range, taskCount);
-    //       }});
-    // }
+    for (int c=1; c<=100; c++) {
+      final int taskCount = c;
+      Mark7(String.format("countParTask1 %6d", taskCount), 
+        new IntToDouble() {
+          public double call(int i) { 
+            return countParallelN1(range, taskCount);
+          }});
+    }
+    for (int c=1; c<=100; c++) {
+      final int taskCount = c;
+      Mark7(String.format("countParTask2 %6d", taskCount), 
+        new IntToDouble() {
+          public double call(int i) { 
+            return countParallelN2(range, taskCount);
+          }});
+    }
   }
 
   private static boolean isPrime(int n) {
