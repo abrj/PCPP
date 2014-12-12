@@ -12,11 +12,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.*;
 
-public class TestStripedMap {
+public class TestStripedMap { 
   public static void main(String[] args) {
     SystemInfo();
-    testAllMaps();    // Must be run with: java -ea TestStripedMap 
-    // exerciseAllMaps();
+    //testAllMaps();    // Must be run with: java -ea TestStripedMap 
+    exerciseAllMaps();
     // timeAllMaps();
 
   }
@@ -60,7 +60,7 @@ public class TestStripedMap {
     for (int t=0; t<threadCount; t++) {
       final int myThread = t;
       threads[t] = new Thread(new Runnable() { public void run() {
-        Random random = new Random(37 * myThread + 78);
+        Random random = new Random(99);
         for (int i=0; i<perThread; i++) {
           Integer key = random.nextInt(range);
           if (!map.containsKey(key)) {
@@ -93,24 +93,24 @@ public class TestStripedMap {
   }
 
   private static void exerciseAllMaps() {
-    final int bucketCount = 100_000, lockCount = 16, threadCount = 16;
+    final int bucketCount = 77, lockCount = 7, threadCount = 16;
     final int iterations = 1_600_000, perThread = iterations / threadCount;
     final int range = 100_000;
-    System.out.println(Mark7(String.format("%-21s %d", "SynchronizedMap", threadCount),
-          new IntToDouble() { public double call(int i) {
-            return exerciseMap(threadCount, perThread, range,
-                               new SynchronizedMap<Integer,String>(bucketCount));
-          }}));
-    System.out.println(Mark7(String.format("%-21s %d", "StripedMap", threadCount),
-          new IntToDouble() { public double call(int i) {
-            return exerciseMap(threadCount, perThread, range,
-                               new StripedMap<Integer,String>(bucketCount, lockCount));
-          }}));/*
+    // System.out.println(Mark7(String.format("%-21s %d", "SynchronizedMap", threadCount),
+    //       new IntToDouble() { public double call(int i) {
+    //         return exerciseMap(threadCount, perThread, range,
+    //                            new SynchronizedMap<Integer,String>(bucketCount));
+    //       }}));
+    // System.out.println(Mark7(String.format("%-21s %d", "StripedMap", threadCount),
+    //       new IntToDouble() { public double call(int i) {
+    //         return exerciseMap(threadCount, perThread, range,
+    //                            new StripedMap<Integer,String>(bucketCount, lockCount));
+    //       }}));
     System.out.println(Mark7(String.format("%-21s %d", "StripedWriteMap", threadCount), 
           new IntToDouble() { public double call(int i) {
             return exerciseMap(threadCount, perThread, range,
                                new StripedWriteMap<Integer,String>(bucketCount, lockCount));
-          }}));
+          }}));/*
     System.out.println(Mark7(String.format("%-21s %d", "WrapConcHashMap", threadCount),
           new IntToDouble() { public double call(int i) {
             return exerciseMap(threadCount, perThread, range,
