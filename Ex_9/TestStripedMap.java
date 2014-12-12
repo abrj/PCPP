@@ -79,7 +79,11 @@ public class TestStripedMap {
             public void accept(Integer k, String v) {
               ai.getAndIncrement();
         }});
-        // System.out.println(ai.intValue() + " " + map.size());
+         System.out.println(ai.intValue() + " " + map.size());
+         System.out.println("Adds: " + map.getAdds().get());
+         System.out.println("Removals: " + map.getRemovals().get());
+         int result = map.getRemovals().get() - map.getAdds().get();
+         System.out.println("Subtracted: " + result);
       }});
     }
     for (int t=0; t<threadCount; t++) 
@@ -226,6 +230,8 @@ interface OurMap<K,V> {
   V put(K k, V v);
   V putIfAbsent(K k, V v);
   V remove(K k);
+  AtomicInteger getAdds();
+  AtomicInteger getRemovals();  
   int size();
   void forEach(Consumer<K,V> consumer);
   void reallocateBuckets();
@@ -243,6 +249,13 @@ class SynchronizedMap<K,V> implements OurMap<K,V>  {
   
   public SynchronizedMap(int bucketCount) {
     this.buckets = makeBuckets(bucketCount);
+  }
+
+  public AtomicInteger getAdds(){
+    return null;
+  }
+  public AtomicInteger getRemovals(){
+    return null;
   }
 
   @SuppressWarnings("unchecked") 
@@ -396,6 +409,13 @@ class StripedMap<K,V> implements OurMap<K,V> {
   private final int lockCount;
   private final Object[] locks;
   private final int[] sizes;
+
+  public AtomicInteger getAdds(){
+    return null;
+  }
+  public AtomicInteger getRemovals(){
+    return null;
+  }
 
   public StripedMap(int bucketCount, int lockCount) {
     if (bucketCount % lockCount != 0)
@@ -621,7 +641,9 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
   private volatile ItemNode<K,V>[] buckets;
   private final int lockCount;
   private final Object[] locks;
-  private final AtomicIntegerArray sizes;  
+  private final AtomicIntegerArray sizes;
+  public final AtomicInteger removals = new AtomicInteger(0);  
+  public final AtomicInteger adds = new AtomicInteger(0);  
 
   public StripedWriteMap(int bucketCount, int lockCount) {
     if (bucketCount % lockCount != 0)
@@ -632,6 +654,14 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
     this.sizes = new AtomicIntegerArray(lockCount);
     for (int stripe=0; stripe<lockCount; stripe++) 
       this.locks[stripe] = new Object();
+  }
+
+  public AtomicInteger getAdds(){
+    return adds;
+  }
+
+  public AtomicInteger getRemovals(){
+    return removals;
   }
 
   @SuppressWarnings("unchecked") 
@@ -689,6 +719,7 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
       bs[hash] = new ItemNode<K,V>(k, v, newNode);
       // Write for visibility; increment if k was not already in map
       sizes.getAndAdd(stripe, newNode == node ? 1 : 0);
+      adds.getAndAdd(newNode == node ? 1 : 0);
       return old.get();
     }
   }
@@ -696,19 +727,21 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
   //Ex 7.2.2
   // Put v at key k only if absent
   public V putIfAbsent(K k, V v) {
-    final ItemNode<K,V>[] bs = buckets;
     final int h = getHash(k), stripe = h % lockCount;
-    final int hash = h % bs.length;
-    final Holder<V> old = new Holder<V>();
-    final ItemNode<K,V> node = bs[hash];
     synchronized(locks[stripe]){
-    if(ItemNode.search(node, k, old))
-      //Do nothing
-      return node.v;
-    else{
+      final ItemNode<K,V>[] bs = buckets;
+      final int hash = h % bs.length;
+      final Holder<V> old = new Holder<V>();
+      final ItemNode<K,V> node = bs[hash];
+      if(ItemNode.search(node, k, old))
+        //Do nothing
+        return node.v;
+      else{
         ItemNode<K,V> newNode = new ItemNode<K,V>(k, v, bs[hash]);
         buckets[hash] = newNode;
         sizes.getAndIncrement(stripe);
+        adds.getAndIncrement();
+        //sizes.getAndAdd(stripe, newNode == node ? 1 : 0);
         return null;
       }
     }
@@ -717,21 +750,21 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
   //Ex 7.2.3 - RESUBMITTED
   // Remove and return the value at key k if any, else return null
   public V remove(K k) {
-    final ItemNode<K,V>[] bs = buckets;
     final int h = getHash(k), stripe = h % lockCount;
-    final Holder<V> old = new Holder<V>();
-    final int hash = h % bs.length;
-    final ItemNode<K,V> node = bs[hash];
-    ItemNode<K,V> prev = node;
     synchronized(locks[stripe]){
+      final ItemNode<K,V>[] bs = buckets;
+      final Holder<V> old = new Holder<V>();
+      final int hash = h % bs.length;
+      final ItemNode<K,V> node = bs[hash];
+      ItemNode<K,V> prev = node;
       if(ItemNode.search(bs[hash], k, old)){
         V oldV = null;
-        final ItemNode<K,V> newNode = ItemNode.delete(bs[hash],k,old);
+        //final ItemNode<K,V> newNode = ItemNode.delete(bs[hash],k,old);
         if(k.equals(prev.k)){
           oldV = prev.v;
           sizes.getAndDecrement(stripe);
-          sizes.getAndAdd(stripe, newNode == node ? 1 : 0);
           buckets[hash] = prev.next;
+          removals.getAndIncrement();
           return oldV;
         }
         else{
@@ -741,8 +774,8 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
           if(prev.next != null){
             oldV = prev.next.v;
             sizes.getAndDecrement(stripe);
-            sizes.getAndAdd(stripe, newNode == node ? 1 : 0);
             buckets[hash] = prev.next.next;
+            removals.getAndIncrement();
             return oldV;
           }
           else{
@@ -760,14 +793,16 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
   public void forEach(Consumer<K,V> consumer) {
     final ItemNode<K,V>[] bs = buckets;
     for(int i = 0; i<lockCount; i++){
-      final int s = bs.length;
-      for(int j=i; j<s; j+=lockCount){
-        int stripe = j % lockCount;
-        if(sizes.get(stripe)!= 0){
-          ItemNode<K,V> itemNode = bs[j];
-          while(itemNode != null){
-            consumer.accept(itemNode.k, itemNode.v);
-            itemNode = itemNode.next;
+      synchronized(locks[i]){
+        final int s = bs.length;
+        for(int j=i; j<s; j+=lockCount){
+          int stripe = j % lockCount;
+          if(sizes.get(stripe)!= 0){
+            ItemNode<K,V> itemNode = bs[j];
+            while(itemNode != null){
+              consumer.accept(itemNode.k, itemNode.v);
+              itemNode = itemNode.next;
+            }
           }
         }
       }
@@ -874,6 +909,13 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
 
 class WrapConcurrentHashMap<K,V> implements OurMap<K,V> {
   final ConcurrentHashMap<K,V> underlying = new ConcurrentHashMap<K,V>();
+
+  public AtomicInteger getAdds(){
+    return null;
+  }
+  public AtomicInteger getRemovals(){
+    return null;
+  }
 
   public boolean containsKey(K k) {
     return underlying.containsKey(k);
