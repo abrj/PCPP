@@ -704,12 +704,12 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
     synchronized(locks[stripe]){
     if(ItemNode.search(node, k, old))
       //Do nothing
-      return null;
+      return node.v;
     else{
         ItemNode<K,V> newNode = new ItemNode<K,V>(k, v, bs[hash]);
         buckets[hash] = newNode;
         sizes.getAndIncrement(stripe);
-        return newNode.v;
+        return null;
       }
     }
   }
