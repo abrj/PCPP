@@ -291,6 +291,8 @@ class NewLongAdderLessPadded {
       // Believe it or not, this sometimes speeds up the code,
       // presumably because it avoids false sharing of cache lines:
       // new Object(); new Object(); new Object(); new Object();
+      // The allocations above does speed up the process a small bit (at most double up on speed), 
+      // depending on the used hardware.
       counters[stripe] = new AtomicLong();
     }
   }
