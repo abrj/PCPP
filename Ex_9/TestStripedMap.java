@@ -706,9 +706,10 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
       //Do nothing
       return null;
     else{
-        buckets[hash] = new ItemNode<K,V>(k, v, bs[hash]);
+        ItemNode<K,V> newNode = new ItemNode<K,V>(k, v, bs[hash]);
+        buckets[hash] = newNode;
         sizes.getAndIncrement(stripe);
-        return old.get();
+        return newNode.v;
       }
     }
   }
