@@ -721,13 +721,33 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
     final Holder<V> old = new Holder<V>();
     final int hash = h % bs.length;
     final ItemNode<K,V> node = bs[hash];
+    ItemNode<K,V> prev = node;
     synchronized(locks[stripe]){
       if(ItemNode.search(bs[hash], k, old)){
+        V oldV = null;
         final ItemNode<K,V> newNode = ItemNode.delete(bs[hash],k,old);
-        bs[hash] = node.next;
-        sizes.getAndDecrement(stripe);
-        sizes.getAndAdd(stripe, newNode == node ? 1 : 0);
-        return old.get();
+        if(k.equals(prev.k)){
+          oldV = prev.v;
+          sizes.getAndDecrement(stripe);
+          sizes.getAndAdd(stripe, newNode == node ? 1 : 0);
+          buckets[hash] = prev.next;
+          return oldV;
+        }
+        else{
+          while(prev.next != null && !k.equals(prev.next.k)){
+            prev = prev.next;
+          }
+          if(prev.next != null){
+            oldV = prev.next.v;
+            sizes.getAndDecrement(stripe);
+            sizes.getAndAdd(stripe, newNode == node ? 1 : 0);
+            buckets[hash] = prev.next.next;
+            return oldV;
+          }
+          else{
+            return null;
+          }
+        }
       }
       //Do nothing
       return null;
