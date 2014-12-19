@@ -4,8 +4,8 @@
 // NOT TO BE HANDED OUT, CONTAINS SOLUTIONS FOR WEEK 10
 
 // Compile and run like this:
-//   javac -cp ~/lib/multiverse-core-0.7.0.jar TestStmHistogram.java
-//   java -cp ~/lib/multiverse-core-0.7.0.jar:. TestStmHistogram
+//   javac -cp multiverse-core-0.7.0.jar TestStmHistogram.java
+//   java -cp multiverse-core-0.7.0.jar:. TestStmHistogram
 
 // For the Multiverse library:
 import org.multiverse.api.references.*;
@@ -32,6 +32,7 @@ class TestStmHistogram {
     final int threadCount = 10, perThread = range / threadCount;
     final CyclicBarrier startBarrier = new CyclicBarrier(threadCount + 1), 
       stopBarrier = startBarrier;
+    Timer timer = new Timer();
     final Thread[] threads = new Thread[threadCount];
     for (int t=0; t<threadCount; t++) {
       final int from = perThread * t, 
@@ -59,6 +60,7 @@ class TestStmHistogram {
     }
     try { startBarrier.await(); } catch (Exception exn) { }
     try { stopBarrier.await(); } catch (Exception exn) { }
+    System.out.println("TIME: " + timer.check());
     dump(histogram);
     dump(total);
 
