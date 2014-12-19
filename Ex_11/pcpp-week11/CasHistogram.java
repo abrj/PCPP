@@ -2,6 +2,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CyclicBarrier;
 
+//Ex 11.1
 public class CasHistogram implements Histogram {
   private final AtomicInteger[] counts;
 
@@ -12,7 +13,7 @@ public class CasHistogram implements Histogram {
       counts[i] = new AtomicInteger(0);
     }
   }
-  //Ex 10.2.1 
+  //Ex 11.1.1
   public void increment(int bin) {
      int oldValue, newValue;
      do {
@@ -21,17 +22,15 @@ public class CasHistogram implements Histogram {
 	 } while (!counts[bin].compareAndSet(oldValue, newValue));
   }
 
-  //Ex 10.2.1
   public int getCount(int bin) {
     return counts[bin].get();
   }
 
-  //Ex 10.2.1
   public int getSpan() {
       return counts.length;
   }
 
-  //10.2.3
+  //Ex 11.1.1
   public int[] getBins() {
     int[] ar = new int[getSpan()];
     for(int i = 0; i < ar.length; i++){
@@ -40,7 +39,7 @@ public class CasHistogram implements Histogram {
     return ar;
   }
 
-  //10.2.4
+  //Ex 11.1.1
   public int getAndClear(int bin) {
   	int oldValue, newValue;
     do {
@@ -50,6 +49,7 @@ public class CasHistogram implements Histogram {
 	return oldValue;
   }
 
+  //helper method to transferBins()
   public void set(int bin, int newValue) {
   	int oldValue;
     do {
@@ -57,8 +57,8 @@ public class CasHistogram implements Histogram {
 	} while (!counts[bin].compareAndSet(oldValue, newValue));
   }
 
-  //10.2.5
-  public void transferBins(Histogram hist) {
+    //Ex 11.1.1
+	public void transferBins(Histogram hist) {
     for(int i = 0 ; i<hist.getSpan(); i++){
       set(counts[i].get(), getAndClear(counts[i].get()));
     }
@@ -86,7 +86,7 @@ class TestCasHistogram {
     final int threadCount = 10, perThread = range / threadCount;
     final CyclicBarrier startBarrier = new CyclicBarrier(threadCount + 1), 
       stopBarrier = startBarrier;
-    Timer timer = new Timer();
+    Timer timer = new Timer();	    //Ex 11.1.3
     final Thread[] threads = new Thread[threadCount];
     for (int t=0; t<threadCount; t++) {
       final int from = perThread * t, 
@@ -102,7 +102,6 @@ class TestCasHistogram {
               }
             });
         threads[t].start();
-        //Ex 10.2.6
         try{
           Thread.sleep(30);
         }
@@ -114,7 +113,7 @@ class TestCasHistogram {
     }
     try { startBarrier.await(); } catch (Exception exn) { }
     try { stopBarrier.await(); } catch (Exception exn) { }
-    System.out.println("TIME: " + timer.check());
+    System.out.println("TIME: " + timer.check());	    //Ex 11.1.3
     dump(histogram);
     dump(total);
 
