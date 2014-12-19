@@ -26,8 +26,9 @@ public class SimpleRWTryLock{
 
 	}
 
+	//Ex 11.2.4
 	public void readerUnlock(){
-
+		
 	}
 	//Ex 11.2.1
 	public boolean writerTryLock(){
